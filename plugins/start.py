@@ -163,10 +163,10 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "• 1 Month: ₹100"
-                    "• 3 Months: ₹200"
-                    "• 6 Months: ₹300"
-                    "• Lifetime: ₹500"
+                    "\n•1 Month: ₹100"
+                    "\n•3 Months: ₹200"
+                    "\n•6 Months: ₹300"
+                    "\n•Lifetime: ₹500"
                     "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -195,12 +195,14 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"🎬 *Desi/Onlyfans Collection*\n\n"
-                f"Selected Plan: *{duration}*\n"
-                f"Price: *{price}*\n"
-                f"UPI ID:* `{upi_id}` *\n\n"
+                f"🎬 Desi/Onlyfans Collection\n\n"
+                f"Selected Plan: {duration}\n"
+                f"Price: {price}\n"
+                f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ *Payment Done*."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(client.send_photo,
                 chat_id=query.message.chat.id,
@@ -230,7 +232,7 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"Feature: **{duration}**\n"
+                    f"Feature: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
                 ),
@@ -279,10 +281,10 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "• 1 Month: ₹150"
-                    "• 3 Months: ₹250"
-                    "• 6 Months: ₹350"
-                    "• Lifetime: ₹550"
+                    "\n•1 Month: ₹150"
+                    "\n•3 Months: ₹250"
+                    "\n•6 Months: ₹350"
+                    "\n•Lifetime: ₹550"
                     "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -311,12 +313,14 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"📸 *Insta/Snap Collection*\n\n"
-                f"Selected Plan: *{duration}*\n"
-                f"Price: *{price}*\n"
-                f"UPI ID:* `{upi_id}` *\n\n"
+                f"📸 Insta/Snap Collection\n\n"
+                f"Selected Plan: {duration}\n"
+                f"Price: {price}\n"
+                f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ *Payment Done*."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(client.send_photo,
                 chat_id=query.message.chat.id,
@@ -346,7 +350,7 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"Feature: **{duration}**\n"
+                    f"Feature: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
                 ),
@@ -395,10 +399,10 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "• 1 Month: ₹200"
-                    "• 3 Months: ₹400"
-                    "• 6 Months: ₹600"
-                    "• Lifetime: ₹1000"
+                    "\n•1 Month: ₹200"
+                    "\n•3 Months: ₹400"
+                    "\n•6 Months: ₹600"
+                    "\n•Lifetime: ₹1000"
                     "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -427,12 +431,14 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"🕵️‍♂️ *Cp/Rp Collection*\n\n"
-                f"Selected Plan: *{duration}*\n"
-                f"Price: *{price}*\n"
-                f"UPI ID:* `{upi_id}` *\n\n"
+                f"🕵️‍♂️ Cp/Rp Collection\n\n"
+                f"Selected Plan: {duration}\n"
+                f"Price: {price}\n"
+                f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ *Payment Done*."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(client.send_photo,
                 chat_id=query.message.chat.id,
@@ -462,7 +468,7 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"Feature: **{duration}**\n"
+                    f"Feature: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
                 ),
@@ -511,10 +517,10 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "• 1 Month: ₹200"
-                    "• 3 Months: ₹400"
-                    "• 6 Months: ₹600"
-                    "• Lifetime: ₹1000"
+                    "\n•1 Month: ₹200"
+                    "\n•3 Months: ₹400"
+                    "\n•6 Months: ₹600"
+                    "\n•Lifetime: ₹1000"
                     "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -543,12 +549,14 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"*🚀 Mega Collection*\n\n"
-                f"Selected Plan: *{duration}*\n"
-                f"Price: *{price}*\n"
-                f"UPI ID:* `{upi_id}` *\n\n"
+                f"🚀 Mega Collection\n\n"
+                f"Selected Plan: {duration}\n"
+                f"Price: {price}\n"
+                f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ *Payment Done*."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(client.send_photo,
                 chat_id=query.message.chat.id,
@@ -578,7 +586,7 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"Feature: **{duration}**\n"
+                    f"Feature: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
                 ),
@@ -626,10 +634,10 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "• 1 Month: ₹250"
-                    "• 3 Months: ₹450"
-                    "• 6 Months: ₹650"
-                    "• Lifetime: ₹1050"
+                    "\n• 1 Month: ₹250"
+                    "\n•3 Months: ₹450"
+                    "\n•6 Months: ₹650"
+                    "\n•Lifetime: ₹1050"
                     "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -658,12 +666,14 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"📦 *All Collection*\n\n"
-                f"Selected Plan: *{duration}*\n"
-                f"Price: *{price}*\n"
-                f"UPI ID:* `{upi_id}` *\n\n"
+                f"📦 All Collection\n\n"
+                f"Selected Plan: {duration}\n"
+                f"Price: {price}\n"
+                f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ *Payment Done*."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(client.send_photo,
                 chat_id=query.message.chat.id,
@@ -693,7 +703,7 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"Feature: **{duration}**\n"
+                    f"Feature: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
                 ),
