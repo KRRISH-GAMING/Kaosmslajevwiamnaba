@@ -720,7 +720,7 @@ async def callback(client, query):
         elif data == "x3":
             await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("📞 Contact Admin", url="noop"),
+                [InlineKeyboardButton("📞 Contact Admin", url="noop")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x0")]
             ]
             await safe_action(query.message.edit_text,
