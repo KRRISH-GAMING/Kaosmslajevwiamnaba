@@ -144,7 +144,7 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "📋 Choose a plan below:"
-                    "\n🔽 Select which premium channel plan you want to buy:"
+                    "\n\n🔽 Select which premium channel plan you want to buy:"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
@@ -752,14 +752,14 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "💡 Help & Support"
-                    "\nIf you have any questions or need assistance with your subscription, please contact our admin."
-                    "\nFor common questions:"
+                    "\n\nIf you have any questions or need assistance with your subscription, please contact our admin."
+                    "\n\nFor common questions:"
                     "- To Subscribe: Select 'Our Premium Plans' from the main menu"
                     "- To Check Your Subscriptions: Select 'My Paid Subscriptions' from the main menu"
                     "- Payment Issues: Contact our admin directly"
                     "- Access Problems: Contact admin with your subscription details"
                     "- If You Need More Premium: Talk to our support admin"
-                    "\nOur Support Admin: @Benx40x"
+                    "\n\nOur Support Admin: @admin"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
