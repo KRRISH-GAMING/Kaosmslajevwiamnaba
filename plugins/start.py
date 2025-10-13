@@ -40,8 +40,8 @@ async def start(client, message):
             return 
 
             key = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🔔 Join Channel", url=invite_link.invite_link)]
-            ) 
+                [[InlineKeyboardButton("🔔 Join Channel", url=invite_link.invite_link)]]
+            )
             await message.reply_text("⚠️Access Denied!⚠️\n\nPlease Join My Channel To Use Me.\n\nIf You Joined The Channel Then Start Again.", reply_markup=key)
             return
 
