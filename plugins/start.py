@@ -54,10 +54,10 @@ async def start(client, message):
             return await safe_action(message.reply_text,
                 text=(
                     "Hello👋 Members"
-                    "\n🎖️ Welcome To The Premium Channel Subscription Bot"
-                    "\nHere you can buy premium channels through our bot and get exclusive content instantly!"
-                    "\n💳 Make payment and get your premium link right now in seconds."
-                    "\n👇🏻 Please choose an option below:"
+                    "\n\n🎖️ Welcome To The Premium Channel Subscription Bot"
+                    "\n\nHere you can buy premium channels through our bot and get exclusive content instantly!"
+                    "\n\n💳 Make payment and get your premium link right now in seconds."
+                    "\n\n👇🏻 Please choose an option below:"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
@@ -122,10 +122,10 @@ async def callback(client, query):
             await safe_action(query.message.edit_text,
                 text=(
                     "Hello👋 Members"
-                    "\n🎖️ Welcome To The Premium Channel Subscription Bot"
-                    "\nHere you can buy premium channels through our bot and get exclusive content instantly!"
-                    "\n💳 Make payment and get your premium link right now in seconds."
-                    "\n👇🏻 Please choose an option below:"
+                    "\n\n🎖️ Welcome To The Premium Channel Subscription Bot"
+                    "\n\nHere you can buy premium channels through our bot and get exclusive content instantly!"
+                    "\n\n💳 Make payment and get your premium link right now in seconds."
+                    "\n\n👇🏻 Please choose an option below:"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
