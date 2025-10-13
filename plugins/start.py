@@ -730,7 +730,7 @@ async def callback(client, query):
                     "\nFor common questions:"
                     "- To Subscribe: Select 'Our Premium Plans' from the main menu"
                     "- To Check Your Subscriptions: Select 'My Paid Subscriptions' from the main menu"
-                    '- Payment Issues: Contact our admin directly"
+                    "- Payment Issues: Contact our admin directly"
                     "- Access Problems: Contact admin with your subscription details"
                     "- If You Need More Premium: Talk to our support admin"
                     "\nOur Support Admin: @Benx40x"
