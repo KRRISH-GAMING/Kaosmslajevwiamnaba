@@ -34,10 +34,12 @@ async def start(client, message):
             await client.get_chat_member(AUTH_CHANNEL, message.from_user.id)
         except:
             try:
-                invite_link = await client.create_chat_invite_link(AUTH_CHANNEL, creates_join_request=True)
+                invite_link = (await client.get_chat(AUTH_CHANNEL)).invite_link
+                if not invite_link:
+                    invite_link = (await client.create_chat_invite_link(AUTH_CHANNEL, creates_join_request=True)).invite_link
             except:
                 await message.reply("Make Sure I Am Admin In Your Channel")
-            return 
+                return
 
             key = InlineKeyboardMarkup(
                 [[InlineKeyboardButton("🔔 Join Channel", url=invite_link.invite_link)]]
@@ -842,8 +844,8 @@ async def message_capture(client: Client, message: Message):
                 else:
                     await safe_action(callback_message.edit_text,
                         f"❌ Invalid Txn ID.\n"
-                        f"Expected: `{matched_payment['txn_id']}`\n"
-                        f"Entered: `{txn_id}`\n\n"
+                        f"Expected: `{expected_txn}`\n"
+                        f"Entered: `{new_text}`\n\n"
                         "Please try again or contact admin.",
                         parse_mode=enums.ParseMode.MARKDOWN
                     )
