@@ -153,7 +153,7 @@ async def callback(client, query):
         elif data == "y1":
             await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="noop")],
+                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹100 - 1️⃣ Month", callback_data="y1p1")],
                 [InlineKeyboardButton("💰 ₹200 - 3️⃣ Month", callback_data="y1p2")],
                 [InlineKeyboardButton("💰 ₹300 - 6️⃣ Month", callback_data="y1p3")],
@@ -269,7 +269,7 @@ async def callback(client, query):
         elif data == "y2":
             await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="noop")],
+                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹150 - 1️⃣ Month", callback_data="y2p1")],
                 [InlineKeyboardButton("💰 ₹250 - 3️⃣ Month", callback_data="y2p2")],
                 [InlineKeyboardButton("💰 ₹350 - 6️⃣ Month", callback_data="y2p3")],
@@ -385,7 +385,7 @@ async def callback(client, query):
         elif data == "y3":
             await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="noop")],
+                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y3p1")],
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y3p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y3p3")],
@@ -501,7 +501,7 @@ async def callback(client, query):
         elif data == "y4":
             await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="noop")],
+                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y4p1")],
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y4p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y4p3")],
@@ -736,7 +736,7 @@ async def callback(client, query):
         elif data == "x3":
             await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("📞 Contact Admin", url="noop")],
+                [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x0")]
             ]
             await safe_action(query.message.edit_text,
