@@ -158,7 +158,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹200 - 3️⃣ Month", callback_data="y1p2")],
                 [InlineKeyboardButton("💰 ₹300 - 6️⃣ Month", callback_data="y1p3")],
                 [InlineKeyboardButton("💰 ₹500 - Lifetime", callback_data="y1p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y1")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(query.message.edit_text,
                 text=(
@@ -187,7 +187,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="y1")]
+                [InlineKeyboardButton("🔙 Back", callback_data="y1")]
             ]
 
             upi_id = "krrishmehta@airtel"
@@ -199,7 +199,7 @@ async def callback(client, query):
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ *Payment Done*."
+                f"Once you pay, click ✅ Payment Done."
             )
 
             await safe_action(query.message.delete)
@@ -276,7 +276,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹250 - 3️⃣ Month", callback_data="y2p2")],
                 [InlineKeyboardButton("💰 ₹350 - 6️⃣ Month", callback_data="y2p3")],
                 [InlineKeyboardButton("💰 ₹550 - Lifetime", callback_data="y2p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y2")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x2")]
             ]
             await safe_action(query.message.edit_text,
                 text=(
@@ -305,7 +305,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="y2")]
+                [InlineKeyboardButton("🔙 Back", callback_data="y2")]
             ]
 
             upi_id = "krrishmehta@airtel"
@@ -317,7 +317,7 @@ async def callback(client, query):
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ *Payment Done*."
+                f"Once you pay, click ✅ Payment Done."
             )
 
             await safe_action(query.message.delete)
@@ -394,7 +394,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y3p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y3p3")],
                 [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y3p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y3")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x3")]
             ]
             await safe_action(query.message.edit_text,
                 text=(
@@ -423,7 +423,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="y3")]
+                [InlineKeyboardButton("🔙 Back", callback_data="y3")]
             ]
 
             upi_id = "krrishmehta@airtel"
@@ -435,7 +435,7 @@ async def callback(client, query):
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ *Payment Done*."
+                f"Once you pay, click ✅ Payment Done."
             )
 
             await safe_action(query.message.delete)
@@ -512,7 +512,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y4p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y4p3")],
                 [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y4p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y4")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x4")]
             ]
             await safe_action(query.message.edit_text,
                 text=(
@@ -541,7 +541,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="y4")]
+                [InlineKeyboardButton("🔙 Back", callback_data="y4")]
             ]
 
             upi_id = "krrishmehta@airtel"
@@ -553,7 +553,7 @@ async def callback(client, query):
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ *Payment Done*."
+                f"Once you pay, click ✅ Payment Done."
             )
 
             await safe_action(query.message.delete)
@@ -629,7 +629,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹450 - 3️⃣ Month", callback_data="y5p2")],
                 [InlineKeyboardButton("💰 ₹650 - 6️⃣ Month", callback_data="y5p3")],
                 [InlineKeyboardButton("💰 ₹1050 - Lifetime", callback_data="y5p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y5")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x5")]
             ]
             await safe_action(query.message.edit_text,
                 text=(
@@ -658,7 +658,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="y5")]
+                [InlineKeyboardButton("🔙 Back", callback_data="y5")]
             ]
 
             upi_id = "krrishmehta@airtel"
@@ -670,7 +670,7 @@ async def callback(client, query):
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ *Payment Done*."
+                f"Once you pay, click ✅ Payment Done."
             )
 
             await safe_action(query.message.delete)
