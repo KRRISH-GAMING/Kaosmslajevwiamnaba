@@ -111,10 +111,6 @@ async def callback(client, query):
         user_id = query.from_user.id
         data = query.data
 
-        upi_id = "krrishmehta@airtel"
-        upi_name = "KM Membership Bot"
-        qr_image = generate_upi_qr(upi_id, upi_name, price)
-
         # Start
         if data == "x0":
             await safe_action(query.answer)
@@ -193,6 +189,10 @@ async def callback(client, query):
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
                 [InlineKeyboardButton("⬅️ Back", callback_data="y1")]
             ]
+
+            upi_id = "krrishmehta@airtel"
+            upi_name = "KM Membership Bot"
+            qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
                 f"🎬 *Desi/Onlyfans Collection*\n\n"
@@ -306,6 +306,10 @@ async def callback(client, query):
                 [InlineKeyboardButton("⬅️ Back", callback_data="y2")]
             ]
 
+            upi_id = "krrishmehta@airtel"
+            upi_name = "KM Membership Bot"
+            qr_image = generate_upi_qr(upi_id, upi_name, price)
+
             caption = (
                 f"📸 *Insta/Snap Collection*\n\n"
                 f"Selected Plan: *{duration}*\n"
@@ -417,6 +421,10 @@ async def callback(client, query):
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
                 [InlineKeyboardButton("⬅️ Back", callback_data="y3")]
             ]
+
+            upi_id = "krrishmehta@airtel"
+            upi_name = "KM Membership Bot"
+            qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
                 f"🕵️‍♂️ *Cp/Rp Collection*\n\n"
@@ -530,6 +538,10 @@ async def callback(client, query):
                 [InlineKeyboardButton("⬅️ Back", callback_data="y4")]
             ]
 
+            upi_id = "krrishmehta@airtel"
+            upi_name = "KM Membership Bot"
+            qr_image = generate_upi_qr(upi_id, upi_name, price)
+
             caption = (
                 f"*🚀 Mega Collection*\n\n"
                 f"Selected Plan: *{duration}*\n"
@@ -640,6 +652,10 @@ async def callback(client, query):
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
                 [InlineKeyboardButton("⬅️ Back", callback_data="y5")]
             ]
+
+            upi_id = "krrishmehta@airtel"
+            upi_name = "KM Membership Bot"
+            qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
                 f"📦 *All Collection*\n\n"
