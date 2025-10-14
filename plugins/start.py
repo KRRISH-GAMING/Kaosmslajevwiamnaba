@@ -34,22 +34,20 @@ async def start(client, message):
             await client.get_chat_member(AUTH_CHANNEL, user_id)
         except:
             try:
-                chat = await client.get_chat(AUTH_CHANNEL)
-                invite_link = chat.invite_link
-                if not invite_link:
-                    new_invite = await client.create_chat_invite_link(
-                        int(AUTH_CHANNEL), creates_join_request=True
-                    )
-                    invite_link = new_invite.invite_link
+                invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
             except:
-                await message.reply("Make Sure I Am Admin In Your Channel")
+                await safe_action(message.reply_text,
+                    "Make Sure I Am Admin In Your Channel"
+                )
                 return
 
-            key = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🔔 Join Channel", url=invite_link)]]
+            btn = [[InlineKeyboardButton("🔔 Join Channel", url=invite_link.invite_link)]]
+
+            return await safe_action(message.reply_text,
+                "🚨 You must join the channel first to use this bot.",
+                reply_markup=InlineKeyboardMarkup(btn),
+                parse_mode=enums.ParseMode.MARKDOWN
             )
-            await message.reply_text("⚠️Access Denied!⚠️\n\nPlease Join My Channel To Use Me.\n\nIf You Joined The Channel Then Click On Check Again Button To Confirm.", reply_markup=key)
-            return
 
         if len(message.command) == 1:
             buttons = [
