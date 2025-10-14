@@ -31,10 +31,10 @@ async def start(client, message):
             )
 
         try:
-            await client.get_chat_member(CHANNEL, message.from_user.id)
+            await client.get_chat_member(AUTH_CHANNEL, user_id)
         except:
             try:
-                invite_link = await client.create_chat_invite_link(int(CHANNEL), creates_join_request=True)
+                invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
             except:
                 await message.reply("Make Sure I Am Admin In Your Channel")
                 return
