@@ -267,7 +267,7 @@ async def callback(client, query):
                     "duration": duration,
                     "amount_expected": amount_expected,
                     "txn_expected": matched_payment["txn_id"],
-                    "callback_message": query.message
+                    "callback_message": query.message,
                     "plan_key": plan_key
                 }
 
