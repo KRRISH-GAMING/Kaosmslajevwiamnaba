@@ -59,7 +59,7 @@ async def start(client, message):
 
         buttons = [
             [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
-            [InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
+            #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
             [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
         ]
 
@@ -129,7 +129,7 @@ async def callback(client, query):
         if data == "x0":
             buttons = [
                 [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
-                [InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
+                #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
                 [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
             ]
             await safe_action(
@@ -171,7 +171,7 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y1":
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFjZTczMjdkMTAyNjk2YjIxNzAz")],
                 [InlineKeyboardButton("💰 ₹100 - 1️⃣ Month", callback_data="y1p1")],
                 [InlineKeyboardButton("💰 ₹200 - 3️⃣ Month", callback_data="y1p2")],
                 [InlineKeyboardButton("💰 ₹300 - 6️⃣ Month", callback_data="y1p3")],
@@ -195,7 +195,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹1", "1️⃣ Month"),
+                "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -236,7 +236,7 @@ async def callback(client, query):
         elif data.startswith("paid_"):
             plan_key = data.replace("paid_", "")
             plan_map = {
-                "y1p1": ("₹1", "1️⃣ Month"),
+                "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -294,7 +294,7 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y2":
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹150 - 1️⃣ Month", callback_data="y2p1")],
                 [InlineKeyboardButton("💰 ₹250 - 3️⃣ Month", callback_data="y2p2")],
                 [InlineKeyboardButton("💰 ₹350 - 6️⃣ Month", callback_data="y2p3")],
@@ -416,7 +416,7 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y3":
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlMjgzMjdkMTAyNjk2YjIxNzE4")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y3p1")],
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y3p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y3p3")],
@@ -538,7 +538,7 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y4":
             buttons = [
-                [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlZDIzMjdkMTAyNjk2YjIxNzI0")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y4p1")],
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y4p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y4p3")],
@@ -660,6 +660,7 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y5":
             buttons = [
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹250 - 1️⃣ Month", callback_data="y5p1")],
                 [InlineKeyboardButton("💰 ₹450 - 3️⃣ Month", callback_data="y5p2")],
                 [InlineKeyboardButton("💰 ₹650 - 6️⃣ Month", callback_data="y5p3")],
@@ -785,7 +786,7 @@ async def callback(client, query):
         # Help
         elif data == "x3":
             buttons = [
-                [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/c/2937162790/22885")],
+                [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/PookieManagerBot")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x0")]
             ]
             await safe_action(
