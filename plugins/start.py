@@ -859,7 +859,7 @@ async def message_capture(client: Client, message: Message):
 
                     invite = await client.create_chat_invite_link(
                         chat_id=channel_id,
-                        name=f"Access for {user.first_name}",
+                        name=f"Access for {message.from_user.first_name}",
                         expire_date=int(time.time()) + 3600,
                         member_limit=1
                     )
