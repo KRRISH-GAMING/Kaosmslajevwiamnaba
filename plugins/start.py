@@ -190,7 +190,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -215,6 +215,8 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
+            await safe_action(query.message.delete)
+
             await safe_action(
                 client.send_photo,
                 chat_id=query.message.chat.id,
@@ -229,7 +231,7 @@ async def callback(client, query):
         elif data.startswith("paid_"):
             plan_key = data.replace("paid_", "")
             plan_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -334,6 +336,8 @@ async def callback(client, query):
                 f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ Payment Done."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(
                 client.send_photo,
@@ -455,6 +459,8 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
+            await safe_action(query.message.delete)
+
             await safe_action(
                 client.send_photo,
                 chat_id=query.message.chat.id,
@@ -575,6 +581,8 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
+            await safe_action(query.message.delete)
+
             await safe_action(
                 client.send_photo,
                 chat_id=query.message.chat.id,
@@ -693,6 +701,8 @@ async def callback(client, query):
                 f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ Payment Done."
             )
+
+            await safe_action(query.message.delete)
 
             await safe_action(
                 client.send_photo,
