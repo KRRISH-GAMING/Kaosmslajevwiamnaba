@@ -1,4 +1,4 @@
-from imports import *
+from pyrogram import *
 from plugins.config import *
 from plugins.start import *
 
