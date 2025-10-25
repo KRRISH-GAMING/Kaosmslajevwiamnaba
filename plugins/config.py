@@ -1,4 +1,4 @@
-from imports import *
+import re, os
 
 try:
     id_pattern = re.compile(r"^.\d+$")

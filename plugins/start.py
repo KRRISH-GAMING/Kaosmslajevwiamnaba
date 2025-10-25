@@ -1,4 +1,9 @@
-from imports import *
+import traceback, asyncio, re, time as pytime
+from datetime import datetime
+from pyrogram import *
+from pyrogram.types import *
+from pyrogram.errors import *
+from pyrogram.errors.exceptions.bad_request_400 import *
 from plugins.config import *
 from plugins.database import *
 from plugins.helper import *
@@ -860,7 +865,7 @@ async def message_capture(client: Client, message: Message):
                     invite = await client.create_chat_invite_link(
                         chat_id=channel_id,
                         name=f"Access for {message.from_user.first_name}",
-                        expire_date=int(time.time()) + 3600,
+                        expire_date=int(pytime.time()) + 3600,
                         member_limit=1
                     )
 
