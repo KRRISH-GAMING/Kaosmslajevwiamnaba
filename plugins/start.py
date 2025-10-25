@@ -1,5 +1,5 @@
-import traceback, asyncio, re, time as pytime
-from datetime import datetime
+import traceback, asyncio, re
+from datetime import datetime, timedelta
 from pyrogram import *
 from pyrogram.types import *
 from pyrogram.errors import *
@@ -865,7 +865,7 @@ async def message_capture(client: Client, message: Message):
                     invite = await client.create_chat_invite_link(
                         chat_id=channel_id,
                         name=f"Access for {message.from_user.first_name}",
-                        expire_date=int(pytime.time()) + 3600,
+                        expire_date = datetime.utcnow() + timedelta(hours=1),
                         member_limit=1
                     )
 
