@@ -17,15 +17,16 @@ Username - @{}"""
 @Client.on_message(filters.command("start") & filters.private)
 async def start(client, message):
     try:
-        user_id=message.from_user.id
-        first_name=message.from_user.first_name
-        last_name=message.from_user.last_name
-        mention=message.from_user.mention
-        username=message.from_user.username
+        user_id = message.from_user.id
+        first_name = message.from_user.first_name
+        last_name = message.from_user.last_name
+        mention = message.from_user.mention
+        username = message.from_user.username
 
         if not await db.is_user_exist(user_id):
             await db.add_user(user_id, first_name)
-            await safe_action(client.send_message,
+            await safe_action(
+                client.send_message,
                 LOG_CHANNEL,
                 LOG_TEXT.format(user_id, mention, username)
             )
@@ -36,37 +37,41 @@ async def start(client, message):
             try:
                 invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
             except:
-                await safe_action(message.reply_text,
-                    "Make Sure I Am Admin In Your Channel"
+                await safe_action(
+                    message.reply_text,
+                    "⚠️ Make sure I'm admin in your channel."
                 )
                 return
 
             btn = [[InlineKeyboardButton("🔔 Join Channel", url=invite_link.invite_link)]]
 
-            return await safe_action(message.reply_text,
+            return await safe_action(
+                message.reply_text,
                 "🚨 You must join the channel first to use this bot.",
                 reply_markup=InlineKeyboardMarkup(btn),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-        if len(message.command) == 1:
-            buttons = [
-                [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
-                [InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
-                [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
-            ]
-            return await safe_action(message.reply_text,
-                text=(
-                    "Hello👋 Members"
-                    "\n\n🎖️ Welcome To The Premium Channel Subscription Bot"
-                    "\n\nHere you can buy premium channels through our bot and get exclusive content instantly!"
-                    "\n\n💳 Make payment and get your premium link right now in seconds."
-                    "\n\n👇🏻 Please choose an option below:"
-                ),
-                reply_markup=InlineKeyboardMarkup(buttons)
-            )
+        buttons = [
+            [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
+            [InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
+            [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
+        ]
+
+        return await safe_action(
+            message.reply_text,
+            text=(
+                "Hello👋 Members"
+                "\n\n🎖️ Welcome To The Premium Channel Subscription Bot"
+                "\n\nHere you can buy premium channels through our bot and get exclusive content instantly!"
+                "\n\n💳 Make payment and get your premium link right now in seconds."
+                "\n\n👇🏻 Please choose an option below:"
+            ),
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
     except Exception as e:
-        await safe_action(client.send_message,
+        await safe_action(
+            client.send_message,
             LOG_CHANNEL,
             f"⚠️ Start Handler Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
@@ -75,10 +80,10 @@ async def start(client, message):
 
 PLAN_CHANNEL_MAP = {
     # Desi/Onlyfans
-    "y1p1": -1001234567890,
-    "y1p2": -1001234567890,
-    "y1p3": -1001234567890,
-    "y1p4": -1001234567890,
+    "y1p1": -1002757972110,
+    "y1p2": -1002757972110,
+    "y1p3": -1002757972110,
+    "y1p4": -1002757972110,
 
     # Insta/Snap
     "y2p1": -1009876543210,
@@ -87,16 +92,16 @@ PLAN_CHANNEL_MAP = {
     "y2p4": -1009876543210,
 
     # Cp/Rp
-    "y3p1": -1001122334455,
-    "y3p2": -1001122334455,
-    "y3p3": -1001122334455,
-    "y3p4": -1001122334455,
+    "y3p1": -1002831215372,
+    "y3p2": -1002831215372,
+    "y3p3": -1002831215372,
+    "y3p4": -1002831215372,
 
     # Mega Collection
-    "y4p1": -1005566778899,
-    "y4p2": -1005566778899,
-    "y4p3": -1005566778899,
-    "y4p4": -1005566778899,
+    "y4p1": -1002897339103,
+    "y4p2": -1002897339103,
+    "y4p3": -1002897339103,
+    "y4p4": -1002897339103,
 
     # All Collection
     "y5p1": -1006677889900,
@@ -117,13 +122,13 @@ async def callback(client, query):
 
         # Start
         if data == "x0":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
                 [InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
                 [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "Hello👋 Members"
                     "\n\n🎖️ Welcome To The Premium Channel Subscription Bot"
@@ -133,29 +138,33 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Plans
         elif data == "x1":
-            await safe_action(query.answer)
             buttons = [
-                [InlineKeyboardButton("🎬 Desi/Onlyfans Collection", callback_data="y1")],
-                [InlineKeyboardButton("📸 Insta/Snap Collection", callback_data="y2")],
+                #[InlineKeyboardButton("🎬 Desi/Onlyfans Collection", callback_data="y1")],
+                #[InlineKeyboardButton("📸 Insta/Snap Collection", callback_data="y2")],
+                #[InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="y3")],
+                #[InlineKeyboardButton("🚀 Mega Collection", callback_data="y4")],
+                #[InlineKeyboardButton("📦 All Collection", callback_data="y5")],
+                [InlineKeyboardButton("🎬 Mixed Collection", callback_data="y1")],
                 [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="y3")],
                 [InlineKeyboardButton("🚀 Mega Collection", callback_data="y4")],
-                [InlineKeyboardButton("📦 All Collection", callback_data="y5")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x0")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "📋 Choose a plan below:"
                     "\n\n🔽 Select which premium channel plan you want to buy:"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Demo & Price
         elif data == "y1":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹100 - 1️⃣ Month", callback_data="y1p1")],
@@ -164,7 +173,8 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹500 - Lifetime", callback_data="y1p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹100"
@@ -175,11 +185,10 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
-            await safe_action(query.answer)
-
             price_map = {
                 "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
@@ -199,26 +208,25 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"🎬 Desi/Onlyfans Collection\n\n"
+                f"🎬 Mixed Collection\n\n"
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ Payment Done."
             )
 
-            await safe_action(query.message.delete)
-
-            await safe_action(client.send_photo,
+            await safe_action(
+                client.send_photo,
                 chat_id=query.message.chat.id,
                 photo=qr_image,
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
+            await safe_action(query.answer)
 
         # User clicked Payment Done
         elif data.startswith("paid_"):
-            await safe_action(query.answer)
             plan_key = data.replace("paid_", "")
             plan_map = {
                 "y1p1": ("₹100", "1️⃣ Month"),
@@ -233,7 +241,8 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
                     f"Feature: {duration}\n"
@@ -259,21 +268,23 @@ async def callback(client, query):
                     "callback_message": query.message
                 }
 
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"✅ Payment detected for ₹{amount_expected}!\n\n"
                     "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
             else:
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"❌ No new payment found for ₹{amount_expected}.\n\n"
                     "Make sure your transaction is completed and try again after 1 minute.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
+            await safe_action(query.answer)
 
         # Demo & Price
         elif data == "y2":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹150 - 1️⃣ Month", callback_data="y2p1")],
@@ -282,7 +293,8 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹550 - Lifetime", callback_data="y2p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x2")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹150"
@@ -293,11 +305,10 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Payment menu when a price is selected
         elif data.startswith("y2p"):
-            await safe_action(query.answer)
-
             price_map = {
                 "y2p1": ("₹150", "1️⃣ Month"),
                 "y2p2": ("₹250", "3️⃣ Month"),
@@ -324,19 +335,18 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
-            await safe_action(query.message.delete)
-
-            await safe_action(client.send_photo,
+            await safe_action(
+                client.send_photo,
                 chat_id=query.message.chat.id,
                 photo=qr_image,
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
+            await safe_action(query.answer)
 
         # User clicked Payment Done
         elif data.startswith("paid_"):
-            await safe_action(query.answer)
             plan_key = data.replace("paid_", "")
             plan_map = {
                 "y2p1": ("₹150", "1️⃣ Month"),
@@ -351,7 +361,8 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
                     f"Feature: {duration}\n"
@@ -377,21 +388,23 @@ async def callback(client, query):
                     "callback_message": query.message
                 }
 
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"✅ Payment detected for ₹{amount_expected}!\n\n"
                     "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
             else:
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"❌ No new payment found for ₹{amount_expected}.\n\n"
                     "Make sure your transaction is completed and try again after 1 minute.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
+            await safe_action(query.answer)
 
         # Demo & Price
         elif data == "y3":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y3p1")],
@@ -400,7 +413,8 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y3p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x3")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹200"
@@ -411,11 +425,10 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Payment menu when a price is selected
         elif data.startswith("y3p"):
-            await safe_action(query.answer)
-
             price_map = {
                 "y3p1": ("₹200", "1️⃣ Month"),
                 "y3p2": ("₹400", "3️⃣ Month"),
@@ -442,19 +455,18 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
-            await safe_action(query.message.delete)
-
-            await safe_action(client.send_photo,
+            await safe_action(
+                client.send_photo,
                 chat_id=query.message.chat.id,
                 photo=qr_image,
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
+            await safe_action(query.answer)
 
         # User clicked Payment Done
         elif data.startswith("paid_"):
-            await safe_action(query.answer)
             plan_key = data.replace("paid_", "")
             plan_map = {
                 "y3p1": ("₹200", "1️⃣ Month"),
@@ -469,7 +481,8 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
                     f"Feature: {duration}\n"
@@ -495,21 +508,23 @@ async def callback(client, query):
                     "callback_message": query.message
                 }
 
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"✅ Payment detected for ₹{amount_expected}!\n\n"
                     "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
             else:
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"❌ No new payment found for ₹{amount_expected}.\n\n"
                     "Make sure your transaction is completed and try again after 1 minute.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
+            await safe_action(query.answer)
 
         # Demo & Price
         elif data == "y4":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("🔥 Demo", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y4p1")],
@@ -518,7 +533,8 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y4p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x4")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹200"
@@ -529,11 +545,10 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Payment menu when a price is selected
         elif data.startswith("y4p"):
-            await safe_action(query.answer)
-
             price_map = {
                 "y4p1": ("₹200", "1️⃣ Month"),
                 "y4p2": ("₹400", "3️⃣ Month"),
@@ -560,19 +575,18 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
-            await safe_action(query.message.delete)
-
-            await safe_action(client.send_photo,
+            await safe_action(
+                client.send_photo,
                 chat_id=query.message.chat.id,
                 photo=qr_image,
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
+            await safe_action(query.answer)
 
         # User clicked Payment Done
         elif data.startswith("paid_"):
-            await safe_action(query.answer)
             plan_key = data.replace("paid_", "")
             plan_map = {
                 "y4p1": ("₹200", "1️⃣ Month"),
@@ -587,7 +601,8 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
                     f"Feature: {duration}\n"
@@ -613,21 +628,23 @@ async def callback(client, query):
                     "callback_message": query.message
                 }
 
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"✅ Payment detected for ₹{amount_expected}!\n\n"
                     "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
             else:
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"❌ No new payment found for ₹{amount_expected}.\n\n"
                     "Make sure your transaction is completed and try again after 1 minute.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
+            await safe_action(query.answer)
 
         # Demo & Price
         elif data == "y5":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("💰 ₹250 - 1️⃣ Month", callback_data="y5p1")],
                 [InlineKeyboardButton("💰 ₹450 - 3️⃣ Month", callback_data="y5p2")],
@@ -635,7 +652,8 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹1050 - Lifetime", callback_data="y5p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x5")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
                     "\n• 1 Month: ₹250"
@@ -646,11 +664,10 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         # Payment menu when a price is selected
         elif data.startswith("y5p"):
-            await safe_action(query.answer)
-
             price_map = {
                 "y5p1": ("₹250", "1️⃣ Month"),
                 "y5p2": ("₹450", "3️⃣ Month"),
@@ -677,19 +694,18 @@ async def callback(client, query):
                 f"Once you pay, click ✅ Payment Done."
             )
 
-            await safe_action(query.message.delete)
-
-            await safe_action(client.send_photo,
+            await safe_action(
+                client.send_photo,
                 chat_id=query.message.chat.id,
                 photo=qr_image,
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
+            await safe_action(query.answer)
 
         # User clicked Payment Done
         elif data.startswith("paid_"):
-            await safe_action(query.answer)
             plan_key = data.replace("paid_", "")
             plan_map = {
                 "y5p1": ("₹250", "1️⃣ Month"),
@@ -704,7 +720,8 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
                     f"Feature: {duration}\n"
@@ -730,17 +747,20 @@ async def callback(client, query):
                     "callback_message": query.message
                 }
 
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"✅ Payment detected for ₹{amount_expected}!\n\n"
                     "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
             else:
-                await safe_action(query.message.edit_text,
+                await safe_action(
+                    query.message.edit_text,
                     f"❌ No new payment found for ₹{amount_expected}.\n\n"
                     "Make sure your transaction is completed and try again after 1 minute.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
+            await safe_action(query.answer)
 
         # Subscription
         elif data == "x2":
@@ -748,12 +768,12 @@ async def callback(client, query):
 
         # Help
         elif data == "x3":
-            await safe_action(query.answer)
             buttons = [
                 [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/c/2937162790/22885")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x0")]
             ]
-            await safe_action(query.message.edit_text,
+            await safe_action(
+                query.message.edit_text,
                 text=(
                     "💡 Help & Support"
                     "\n\nIf you have any questions or need assistance with your subscription, please contact our admin."
@@ -767,15 +787,18 @@ async def callback(client, query):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            await safe_action(query.answer)
 
         else:
-            await safe_action(client.send_message,
+            await safe_action(
+                client.send_message,
                 LOG_CHANNEL,
                 f"⚠️ Unknown Callback Data Received:\n\n{data}\n\nUser: {query.from_user.id}\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
             )
             await safe_action(query.answer, "⚠️ Unknown action.", show_alert=True)
     except Exception as e:
-        await safe_action(client.send_message,
+        await safe_action(
+            client.send_message,
             LOG_CHANNEL,
             f"⚠️ Callback Handler Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
@@ -816,7 +839,8 @@ async def message_capture(client: Client, message: Message):
                 if new_text == expected_txn:
                     channel_id = PLAN_CHANNEL_MAP.get(plan_key)
                     if not channel_id:
-                        await safe_action(callback_message.edit_text,
+                        await safe_action(
+                            callback_message.edit_text,
                             "⚠️ No channel assigned for this plan. Contact admin."
                         )
                         return
@@ -828,7 +852,8 @@ async def message_capture(client: Client, message: Message):
                         member_limit=1
                     )
 
-                    await safe_action(callback_message.edit_text,
+                    await safe_action(
+                        callback_message.edit_text,
                         f"✅ Payment verified!\n\n"
                         f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                         f"⚠️ This link will expire automatically after you join.",
@@ -844,7 +869,8 @@ async def message_capture(client: Client, message: Message):
 
                     asyncio.create_task(revoke_after_join())
                 else:
-                    await safe_action(callback_message.edit_text,
+                    await safe_action(
+                        callback_message.edit_text,
                         f"❌ Invalid Txn ID.\n"
                         f"Expected: `{expected_txn}`\n"
                         f"Entered: `{new_text}`\n\n"
@@ -886,7 +912,8 @@ async def message_capture(client: Client, message: Message):
                 for old_txn in expired_txns:
                     del PAYMENT_CACHE[old_txn]
     except Exception as e:
-        await safe_action(client.send_message,
+        await safe_action(
+            client.send_message,
             LOG_CHANNEL,
             f"⚠️ Clone message_capture Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
