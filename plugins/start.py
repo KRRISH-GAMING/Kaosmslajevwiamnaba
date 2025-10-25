@@ -299,7 +299,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹250 - 3️⃣ Month", callback_data="y2p2")],
                 [InlineKeyboardButton("💰 ₹350 - 6️⃣ Month", callback_data="y2p3")],
                 [InlineKeyboardButton("💰 ₹550 - Lifetime", callback_data="y2p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x2")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -421,7 +421,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y3p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y3p3")],
                 [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y3p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x3")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -543,7 +543,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y4p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y4p3")],
                 [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y4p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x4")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -665,7 +665,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("💰 ₹450 - 3️⃣ Month", callback_data="y5p2")],
                 [InlineKeyboardButton("💰 ₹650 - 6️⃣ Month", callback_data="y5p3")],
                 [InlineKeyboardButton("💰 ₹1050 - Lifetime", callback_data="y5p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x5")]
+                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(
                 query.message.edit_text,
