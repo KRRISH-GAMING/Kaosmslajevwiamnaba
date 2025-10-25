@@ -257,7 +257,7 @@ async def callback(client, query):
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE:
+            for txn in PAYMENT_CACHE.values():
                 if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
                     matched_payment = txn
                     break
@@ -379,7 +379,7 @@ async def callback(client, query):
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE:
+            for txn in PAYMENT_CACHE.values():
                 if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
                     matched_payment = txn
                     break
@@ -501,7 +501,7 @@ async def callback(client, query):
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE:
+            for txn in PAYMENT_CACHE.values():
                 if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
                     matched_payment = txn
                     break
@@ -623,7 +623,7 @@ async def callback(client, query):
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE:
+            for txn in PAYMENT_CACHE.values():
                 if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
                     matched_payment = txn
                     break
@@ -744,7 +744,7 @@ async def callback(client, query):
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE:
+            for txn in PAYMENT_CACHE.values():
                 if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
                     matched_payment = txn
                     break
