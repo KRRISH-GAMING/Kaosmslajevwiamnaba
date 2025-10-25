@@ -268,6 +268,7 @@ async def callback(client, query):
                     "amount_expected": amount_expected,
                     "txn_expected": matched_payment["txn_id"],
                     "callback_message": query.message
+                    "plan_key": plan_key
                 }
 
                 await safe_action(
@@ -845,6 +846,7 @@ async def message_capture(client: Client, message: Message):
                 duration = data["duration"]
                 amount_expected = data["amount_expected"]
                 callback_message = data["callback_message"]
+                plan_key = data.get("plan_key")
 
                 if new_text == expected_txn:
                     channel_id = PLAN_CHANNEL_MAP.get(plan_key)
