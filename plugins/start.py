@@ -244,11 +244,13 @@ async def callback(client, query):
 
             matched_payment = None
             for txn in PAYMENT_CACHE.values():
-                if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
+                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
                     matched_payment = txn
                     break
 
             if matched_payment:
+                matched_payment["used_for"] = plan_key
+
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
@@ -367,11 +369,13 @@ async def callback(client, query):
 
             matched_payment = None
             for txn in PAYMENT_CACHE.values():
-                if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
+                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
                     matched_payment = txn
                     break
 
             if matched_payment:
+                matched_payment["used_for"] = plan_key
+
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
@@ -490,11 +494,13 @@ async def callback(client, query):
 
             matched_payment = None
             for txn in PAYMENT_CACHE.values():
-                if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
+                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
                     matched_payment = txn
                     break
 
             if matched_payment:
+                matched_payment["used_for"] = plan_key
+
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
@@ -613,11 +619,13 @@ async def callback(client, query):
 
             matched_payment = None
             for txn in PAYMENT_CACHE.values():
-                if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
+                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
                     matched_payment = txn
                     break
 
             if matched_payment:
+                matched_payment["used_for"] = plan_key
+
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
@@ -736,11 +744,13 @@ async def callback(client, query):
 
             matched_payment = None
             for txn in PAYMENT_CACHE.values():
-                if txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300:
+                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
                     matched_payment = txn
                     break
 
             if matched_payment:
+                matched_payment["used_for"] = plan_key
+
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
