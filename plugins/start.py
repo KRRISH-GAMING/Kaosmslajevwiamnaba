@@ -36,27 +36,6 @@ async def start(client, message):
                 LOG_TEXT.format(user_id, mention, username)
             )
 
-        try:
-            await client.get_chat_member(AUTH_CHANNEL, user_id)
-        except:
-            try:
-                invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
-            except:
-                await safe_action(
-                    message.reply_text,
-                    "⚠️ Make sure I'm admin in your channel."
-                )
-                return
-
-            btn = [[InlineKeyboardButton("🔔 Join Channel", url=invite_link.invite_link)]]
-
-            return await safe_action(
-                message.reply_text,
-                "🚨 You must join the channel first to use this bot.",
-                reply_markup=InlineKeyboardMarkup(btn),
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-
         buttons = [
             [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
             #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
