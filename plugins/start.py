@@ -185,7 +185,7 @@ async def callback(client, query):
             price, duration = price_map[data]
 
             buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
+                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid1_{data}")],
                 [InlineKeyboardButton("🔙 Back", callback_data="y1")]
             ]
 
@@ -214,8 +214,8 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # User clicked Payment Done
-        elif data.startswith("paid_"):
-            plan_key = data.replace("paid_", "")
+        elif data.startswith("paid1_"):
+            plan_key = data.replace("paid1_", "")
             plan_map = {
                 "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
@@ -308,7 +308,7 @@ async def callback(client, query):
             price, duration = price_map[data]
 
             buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
+                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid2_{data}")],
                 [InlineKeyboardButton("🔙 Back", callback_data="y2")]
             ]
 
@@ -337,8 +337,8 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # User clicked Payment Done
-        elif data.startswith("paid_"):
-            plan_key = data.replace("paid_", "")
+        elif data.startswith("paid2_"):
+            plan_key = data.replace("paid2_", "")
             plan_map = {
                 "y2p1": ("₹150", "1️⃣ Month"),
                 "y2p2": ("₹250", "3️⃣ Month"),
@@ -430,7 +430,7 @@ async def callback(client, query):
             price, duration = price_map[data]
 
             buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
+                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid3_{data}")],
                 [InlineKeyboardButton("🔙 Back", callback_data="y3")]
             ]
 
@@ -459,8 +459,8 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # User clicked Payment Done
-        elif data.startswith("paid_"):
-            plan_key = data.replace("paid_", "")
+        elif data.startswith("paid3_"):
+            plan_key = data.replace("paid3_", "")
             plan_map = {
                 "y3p1": ("₹200", "1️⃣ Month"),
                 "y3p2": ("₹400", "3️⃣ Month"),
@@ -552,7 +552,7 @@ async def callback(client, query):
             price, duration = price_map[data]
 
             buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
+                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid4_{data}")],
                 [InlineKeyboardButton("🔙 Back", callback_data="y4")]
             ]
 
@@ -581,8 +581,8 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # User clicked Payment Done
-        elif data.startswith("paid_"):
-            plan_key = data.replace("paid_", "")
+        elif data.startswith("paid4_"):
+            plan_key = data.replace("paid4_", "")
             plan_map = {
                 "y4p1": ("₹200", "1️⃣ Month"),
                 "y4p2": ("₹400", "3️⃣ Month"),
@@ -674,7 +674,7 @@ async def callback(client, query):
             price, duration = price_map[data]
 
             buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid_{data}")],
+                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid5_{data}")],
                 [InlineKeyboardButton("🔙 Back", callback_data="y5")]
             ]
 
@@ -703,8 +703,8 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # User clicked Payment Done
-        elif data.startswith("paid_"):
-            plan_key = data.replace("paid_", "")
+        elif data.startswith("paid5_"):
+            plan_key = data.replace("paid5_", "")
             plan_map = {
                 "y5p1": ("₹250", "1️⃣ Month"),
                 "y5p2": ("₹450", "3️⃣ Month"),
