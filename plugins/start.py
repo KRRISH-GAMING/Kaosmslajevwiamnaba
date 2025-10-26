@@ -39,6 +39,7 @@ async def start(client, message):
         buttons = [
             [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
             #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
+            [InlineKeyboardButton("♈ How To Buy", url="https://t.me/Open_Shorten_Link_Tutorial/13")],
             [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
         ]
 
@@ -109,6 +110,7 @@ async def callback(client, query):
             buttons = [
                 [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
                 #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
+                [InlineKeyboardButton("♈ How To Buy", url="https://t.me/Open_Shorten_Link_Tutorial/13")],
                 [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
             ]
             await safe_action(
