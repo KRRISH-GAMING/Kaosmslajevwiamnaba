@@ -101,7 +101,6 @@ async def set_channel_cmd(client, message):
 
 @Client.on_message(filters.command("getchannels") & filters.user(ADMINS))
 async def get_channels_cmd(client, message):
-    from plugins.channels_runtime import PAYMENT_CHANNEL, X1_CHANNEL, X2_CHANNEL, X3_CHANNEL
     text = f"""📡 <b>Current Channels:</b>
     
 💰 Payment:
