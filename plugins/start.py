@@ -72,7 +72,7 @@ async def set_channel_cmd(client, message):
     try:
         parts = message.text.split(maxsplit=2)
         if len(parts) < 3:
-            return await message.reply_text("Usage:\n`/setchannel <x1/x2/x3> <channel_id>`")
+            return await message.reply_text("Usage:\n`/setchannel <x1/x2/x3> <channel_id>`", parse_mode=enums.ParseMode.MARKDOWN)
 
         name = parts[1].lower()
         value = int(parts[2])
@@ -89,7 +89,7 @@ async def set_channel_cmd(client, message):
         else:
             return await message.reply_text("❌ Invalid channel name!")
 
-        await message.reply_text(f"✅ Updated **{name.upper()}_CHANNEL** to `{value}` (saved in DB)")
+        await message.reply_text(f"✅ Updated **{name.upper()}_CHANNEL** to `{value}` (saved in DB)", parse_mode=enums.ParseMode.MARKDOWN)
     except Exception as e:
         await safe_action(
             client.send_message,
