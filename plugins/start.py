@@ -1,4 +1,4 @@
-import traceback, asyncio, re
+import traceback, asyncio, re, time as pytime
 from datetime import datetime, timedelta
 from pyrogram import *
 from pyrogram.types import *
@@ -18,6 +18,10 @@ Id - <code>{}</code>
 Name - {}
 
 Username - @{}"""
+
+broadcast_cancel = False
+
+START_TIME = pytime.time()
 
 @Client.on_message(filters.command("start") & filters.private)
 async def start(client, message):
@@ -62,8 +66,6 @@ async def start(client, message):
         )
         print(f"⚠️ Start Handler Error: {e}")
         print(traceback.format_exc())
-
-broadcast_cancel = False
 
 @Client.on_message(filters.command("broadcast") & filters.private & filters.user(ADMINS))
 async def broadcast(client, message):
