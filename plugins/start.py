@@ -65,10 +65,10 @@ async def start(client, message):
 
 PLAN_CHANNEL_MAP = {
     # Desi/Onlyfans
-    "y1p1": -1002757972110,
-    "y1p2": -1002757972110,
-    "y1p3": -1002757972110,
-    "y1p4": -1002757972110,
+    "y1p1": X1_CHANNEL,
+    "y1p2": X1_CHANNEL,
+    "y1p3": X1_CHANNEL,
+    "y1p4": X1_CHANNEL,
 
     # Insta/Snap
     "y2p1": -1009876543210,
@@ -77,16 +77,16 @@ PLAN_CHANNEL_MAP = {
     "y2p4": -1009876543210,
 
     # Cp/Rp
-    "y3p1": -1002831215372,
-    "y3p2": -1002831215372,
-    "y3p3": -1002831215372,
-    "y3p4": -1002831215372,
+    "y3p1": X2_CHANNEL,
+    "y3p2": X2_CHANNEL,
+    "y3p3": X2_CHANNEL,
+    "y3p4": X2_CHANNEL,
 
     # Mega Collection
-    "y4p1": -1002897339103,
-    "y4p2": -1002897339103,
-    "y4p3": -1002897339103,
-    "y4p4": -1002897339103,
+    "y4p1": X3_CHANNEL,
+    "y4p2": X3_CHANNEL,
+    "y4p3": X3_CHANNEL,
+    "y4p4": X3_CHANNEL,
 
     # All Collection
     "y5p1": -1006677889900,
@@ -894,7 +894,7 @@ async def message_capture(client: Client, message: Message):
                 del PENDING_TXN[user_id]
                 return
         elif chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL]:
-            if message.chat.id in [-1003178595762]:
+            if message.chat.id in [PAYMENT_CHANNEL]:
 
                 text = message.text or ""
                 if "💰 Airtel Payment Received" not in text:

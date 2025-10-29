@@ -6,7 +6,7 @@ try:
     # Bot Information
     API_ID = int(os.environ.get("API_ID", "15479023"))
     API_HASH = os.environ.get("API_HASH", "f8f6cf547822449c29fc60dae3b31dd4")
-    SESSION_STRING = os.environ.get("SESSION_STRING", "BQDsMO8AmFb6JbgFyK7jiJtXcx3AFBuboExTZHINbxsl8_YzR0HaeAI5_BnsfUv_vN-vrB8NvarvyBvTRb80QQsTUuCahomUwfyd4lYuGyiQ3olZsxvJ-jKg_5XvfMN6DalcD2zNuWGf-FvvTeH_-t8QMcAPXpDxyt97bYsBIBtQAoTDpHu5bqf0h6XphvYAnYPBWLluo6VASKQJ2FsxPQfV0pEflImcLKiakUFNzA5Sn0AX6ZzRbP9gmGvKJg5L4aOD7SmYwaDhm6N7xR4p8jtpx4zszlxriOQB_lCjywawyWw-_O01f0roGKph7TGLkSEr_uJ0asKkJAyIQ3yDiJ751R51JwAAAABaJgrVAA")
+    SESSION_STRING = os.environ.get("SESSION_STRING", "BQDsMO8AYBThDSMHkoXplgI2_wYTP-7m6WX79Yn9ihzDp0Ika1b025mWfR9gYs0-BOukentqjnsb1izUT4Mg_5HHnbqOB_ZLPvgNaMAGRCCgM2HYPxB531pGoZvNh2gpIqE2m4OE7DGreCjyy_R_wCOrkSh559u7T1rSYAQrJ1N_TQ7hRNe55gPMweG0eEJgUFvrf2pkP_iWF8ifxncWHr1u8av868qPUaYyUxdGQPo7_ChsdKq8unSj_UU4xakuNx8X6GQTStF1Uc3iM4Yb1VDWfojj_ByVPmnT8XIE8qQJLVV-gy8uN96Uhryt-nMPm2HDF1Hnzq60SZiZd-FsHeh2epOhZQAAAABaJgrVAA")
     BOT_TOKEN = os.environ.get("BOT_TOKEN", "8459663050:AAHlICH3sLKfmoBkM5IzzApJOkhzJohQqcU")
     BOT_USERNAME = os.environ.get("BOT_USERNAME", "XclusiveMembershipBot") # without @
 
@@ -19,6 +19,10 @@ try:
 
     # Channel Information
     LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", "-1002937162790"))
+    PAYMENT_CHANNEL = int(os.environ.get("PAYMENT_CHANNEL", "-1003178595762"))
+    X1_CHANNEL = int(os.environ.get("X1_CHANNEL", "-1003246924678"))
+    X2_CHANNEL = int(os.environ.get("X2_CHANNEL", "-1003238391861"))
+    X3_CHANNEL = int(os.environ.get("X3_CHANNEL", "-1003130577319"))
 
     # This Is Force Subscribe Channel, also known as Auth Channel 
     auth_channel = os.environ.get("AUTH_CHANNEL", "-1002829948273") # give your force subscribe channel id here else leave it blank
