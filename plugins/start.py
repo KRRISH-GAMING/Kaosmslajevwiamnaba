@@ -63,6 +63,147 @@ async def start(client, message):
         print(f"⚠️ Start Handler Error: {e}")
         print(traceback.format_exc())
 
+broadcast_cancel = False
+
+@Client.on_message(filters.command("broadcast") & filters.private & filters.user(ADMINS))
+async def broadcast(client, message):
+    global broadcast_cancel
+    broadcast_cancel = False
+    try:
+        if message.reply_to_message:
+            b_msg = message.reply_to_message
+        else:
+            b_msg = await safe_action(client.ask,
+                message.chat.id,
+                "📩 Send the message to broadcast\n\n/cancel to stop.",
+                reply_to_message_id=message.id
+            )
+
+            if b_msg.text and b_msg.text.lower() == "/cancel":
+                return await safe_action(message.reply_text, "🚫 Broadcast cancelled.", reply_to_message_id=b_msg.id)
+
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("❌ Cancel Broadcast", callback_data="cancel_broadcast")]]
+        )
+
+        sts = await safe_action(message.reply_text,
+            "⏳ Broadcast starting...",
+            reply_markup=keyboard,
+            reply_to_message_id=b_msg.id
+        )
+        start_time = pytime.time()
+        total_users = await db.total_users_count()
+
+        done = blocked = deleted = failed = success = 0
+
+        users = await db.get_all_users()
+        async for user in users:
+            if broadcast_cancel:
+                await safe_action(sts.edit_text, "🚫 Broadcast cancelled by admin.")
+                print("🛑 Broadcast cancelled mid-way.")
+                return
+            try:
+                if "id" in user:
+                    pti, sh = await broadcast_messagesx(int(user["id"]), b_msg)
+                    if pti:
+                        success += 1
+                    else:
+                        if sh == "Blocked":
+                            blocked += 1
+                        elif sh == "Deleted":
+                            deleted += 1
+                        else:
+                            failed += 1
+                    done += 1
+
+                    if done % 10 == 0 or done == total_users:
+                        progress = broadcast_progress_bar(done, total_users)
+                        percent = (done / total_users) * 100
+                        elapsed = pytime.time() - start_time
+                        speed = done / elapsed if elapsed > 0 else 0
+                        remaining = total_users - done
+                        eta = timedelta(seconds=int(remaining / speed)) if speed > 0 else "∞"
+
+                        try:
+                            await safe_action(sts.edit, f"""
+📢 <b>Broadcast in Progress...</b>
+
+{progress}
+
+👥 Total Users: {total_users}
+✅ Success: {success}
+🚫 Blocked: {blocked}
+❌ Deleted: {deleted}
+⚠️ Failed: {failed}
+
+⏳ ETA: {eta}
+⚡ Speed: {speed:.2f} users/sec
+""", reply_markup=keyboard)
+                        except:
+                            pass
+                else:
+                    done += 1
+                    failed += 1
+            except Exception:
+                failed += 1
+                done += 1
+                continue
+
+        time_taken = timedelta(seconds=int(pytime.time() - start_time))
+        final_progress = broadcast_progress_bar(total_users, total_users)
+        final_text = f"""
+✅ <b>Broadcast Completed</b> ✅
+
+⏱ Duration: {time_taken}
+👥 Total Users: {total_users}
+
+📊 Results:
+✅ Success: {success} ({(success/total_users)*100:.1f}%)
+🚫 Blocked: {blocked} ({(blocked/total_users)*100:.1f}%)
+❌ Deleted: {deleted} ({(deleted/total_users)*100:.1f}%)
+⚠️ Failed: {failed} ({(failed/total_users)*100:.1f}%)
+
+━━━━━━━━━━━━━━━━━━━━━━
+{final_progress} 100%
+━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ Speed: {speed:.2f} users/sec
+"""
+        await safe_action(sts.edit, final_text, reply_markup=keyboard)
+    except Exception as e:
+        await safe_action(client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ Broadcast Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ Broadcast Error: {e}")
+        print(traceback.format_exc())
+
+@Client.on_message(filters.command("stats") & filters.private & filters.user(ADMINS))
+async def stats(client, message):
+    try:
+        me = await get_me_safe(client)
+        if not me:
+            return
+
+        username = me.username
+        users_count = await db.total_users_count()
+
+        uptime = str(timedelta(seconds=int(pytime.time() - START_TIME)))
+
+        await safe_action(message.reply_text,
+            f"📊 Status for @{username}\n\n"
+            f"👤 Users: {users_count}\n"
+            f"⏱ Uptime: {uptime}\n",
+            quote=True
+        )
+    except Exception as e:
+        await safe_action(client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ Stats Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ Stats Error: {e}")
+        print(traceback.format_exc())
+
 PLAN_CHANNEL_MAP = {
     # Desi/Onlyfans
     "y1p1": X1_CHANNEL,

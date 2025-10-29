@@ -154,6 +154,16 @@ async def fetch_fampay_payments():
         print(traceback.format_exc())
         return []
 
+def broadcast_progress_bar(done: int, total: int) -> str:
+    try:
+        progress = done / total if total > 0 else 0
+        filled = int(progress * 20)
+        empty = 20 - filled
+        bar_str = "█" * filled + "░" * empty
+        return f"[{bar_str}] {done}/{total}"
+    except Exception as e:
+        return f"[Error building bar: {e}] {done}/{total}"
+
 async def broadcast_messagesx(user_id, message):
     try:
         await message.copy(chat_id=user_id)
@@ -172,13 +182,3 @@ async def broadcast_messagesx(user_id, message):
         return False, "Error"
     except Exception as e:
         return False, f"Error: {str(e)}"
-
-def broadcast_progress_bar(done: int, total: int) -> str:
-    try:
-        progress = done / total if total > 0 else 0
-        filled = int(progress * 20)
-        empty = 20 - filled
-        bar_str = "█" * filled + "░" * empty
-        return f"[{bar_str}] {done}/{total}"
-    except Exception as e:
-        return f"[Error building bar: {e}] {done}/{total}"
