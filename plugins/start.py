@@ -67,6 +67,49 @@ async def start(client, message):
         print(f"⚠️ Start Handler Error: {e}")
         print(traceback.format_exc())
 
+@Client.on_message(filters.command("setchannel") & filters.user(ADMINS))
+async def set_channel_cmd(client, message):
+    try:
+        parts = message.text.split(maxsplit=2)
+        if len(parts) < 3:
+            return await message.reply_text("Usage:\n`/setchannel <x1/x2/x3> <channel_id>`")
+
+        name = parts[1].lower()
+        value = int(parts[2])
+
+        await db.update_channel(name, value)
+
+        global X1_CHANNEL, X2_CHANNEL, X3_CHANNEL
+        if name == "x1":
+            X1_CHANNEL = value
+        elif name == "x2":
+            X2_CHANNEL = value
+        elif name == "x3":
+            X3_CHANNEL = value
+        else:
+            return await message.reply_text("❌ Invalid channel name!")
+
+        await message.reply_text(f"✅ Updated **{name.upper()}_CHANNEL** to `{value}` (saved in DB)")
+    except Exception as e:
+        await safe_action(
+            client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ Set Channel Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ Set Channel Error: {e}")
+        print(traceback.format_exc())
+
+@Client.on_message(filters.command("getchannels") & filters.user(ADMINS))
+async def get_channels_cmd(client, message):
+    from plugins.channels_runtime import PAYMENT_CHANNEL, X1_CHANNEL, X2_CHANNEL, X3_CHANNEL
+    text = f"""📡 <b>Current Channels:</b>
+    
+💰 Payment:
+📢 X1: <code>{X1_CHANNEL}</code>
+📢 X2: <code>{X2_CHANNEL}</code>
+📢 X3: <code>{X3_CHANNEL}</code>"""
+    await message.reply_text(text)
+
 @Client.on_message(filters.command("broadcast") & filters.private & filters.user(ADMINS))
 async def broadcast(client, message):
     global broadcast_cancel
@@ -78,11 +121,10 @@ async def broadcast(client, message):
             b_msg = await safe_action(client.ask,
                 message.chat.id,
                 "📩 Send the message to broadcast\n\n/cancel to stop.",
-                reply_to_message_id=message.id
             )
 
             if b_msg.text and b_msg.text.lower() == "/cancel":
-                return await safe_action(message.reply_text, "🚫 Broadcast cancelled.", reply_to_message_id=b_msg.id)
+                return await safe_action(message.reply_text, "🚫 Broadcast cancelled.")
 
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton("❌ Cancel Broadcast", callback_data="cancel_broadcast")]]
@@ -91,7 +133,6 @@ async def broadcast(client, message):
         sts = await safe_action(message.reply_text,
             "⏳ Broadcast starting...",
             reply_markup=keyboard,
-            reply_to_message_id=b_msg.id
         )
         start_time = pytime.time()
         total_users = await db.total_users_count()
@@ -196,7 +237,6 @@ async def stats(client, message):
             f"📊 Status for @{username}\n\n"
             f"👤 Users: {users_count}\n"
             f"⏱ Uptime: {uptime}\n",
-            quote=True
         )
     except Exception as e:
         await safe_action(client.send_message,

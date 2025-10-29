@@ -11,6 +11,38 @@ from plugins.database import *
 
 CLONE_ME = {}
 
+X1_CHANNEL = None
+X2_CHANNEL = None
+X3_CHANNEL = None
+
+async def load_channels():
+    from plugins.database import db
+    global X1_CHANNEL, X2_CHANNEL, X3_CHANNEL
+
+    data = await db.get_channels()
+    X1_CHANNEL = int(data.get("x1"))
+    X2_CHANNEL = int(data.get("x2"))
+    X3_CHANNEL = int(data.get("x3"))
+
+async def set_auto_menu(client):
+    try:
+        owner_cmds = [
+            BotCommand("start", "Check I am alive"),
+            BotCommand("setchannel", "Set a channel"),
+            BotCommand("getchannels", "Get all channels"),
+            BotCommand("broadcast", "Broadcast a message to users"),
+            BotCommand("stats", "View bot statistics"),
+        ]
+        for admin_id in ADMINS:
+            await client.set_bot_commands(owner_cmds, scope=BotCommandScopeChat(chat_id=admin_id))
+    except Exception as e:
+        await safe_action(client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ Set Menu Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ Set Menu Error: {e}")
+        print(traceback.format_exc())
+
 async def safe_action(coro_func, *args, **kwargs):
     while True:
         try:
