@@ -17,7 +17,7 @@ Id - <code>{}</code>
 
 Name - {}
 
-Username - @{}"""
+Username - {}"""
 
 broadcast_cancel = False
 
@@ -32,12 +32,14 @@ async def start(client, message):
         mention = message.from_user.mention
         username = message.from_user.username
 
+        username_text = f"@{username}" if username else "None"
+
         if not await db.is_user_exist(user_id):
             await db.add_user(user_id, first_name)
             await safe_action(
                 client.send_message,
                 LOG_CHANNEL,
-                LOG_TEXT.format(user_id, mention, username)
+                LOG_TEXT.format(user_id, mention, username_text)
             )
 
         buttons = [
@@ -1040,6 +1042,21 @@ async def message_capture(client: Client, message: Message):
                         )
                         return
 
+                    user = message.from_user
+                    await safe_action(
+                        client.send_message
+                        ADMINS,
+                        f"📢 <b>New Payment Verified</b>\n\n"
+                        f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
+                        f"💬 <b>Username:</b> @{user.username or 'None'}\n"
+                        f"💰 <b>Amount:</b> ₹{amount_expected}\n"
+                        f"🕒 <b>Duration:</b> {duration}\n"
+                        f"🧾 <b>Txn ID:</b> <code>{expected_txn}</code>\n"
+                        f"🎫 <b>Plan:</b> {plan_key}\n"
+                        f"🔗 <b>Invite Link:</b> {invite.invite_link}",
+                        parse_mode=enums.ParseMode.HTML
+                    )
+
                     invite = await client.create_chat_invite_link(
                         chat_id=channel_id,
                         name=f"Access for {message.from_user.first_name}",
@@ -1050,6 +1067,12 @@ async def message_capture(client: Client, message: Message):
                     await safe_action(
                         callback_message.edit_text,
                         f"✅ Payment verified!\n\n"
+                        f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
+                        f"💬 Username: @{user.username or 'None'}\n"
+                        f"💰 Amount: ₹{amount_expected}\n"
+                        f"🕒 Duration: {duration}\n"
+                        f"🧾 Txn ID: <code>{expected_txn}</code>\n"
+                        f"🎫 Plan: {plan_key}\n"
                         f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                         f"⚠️ This link will expire automatically after you join.",
                         parse_mode=enums.ParseMode.MARKDOWN
