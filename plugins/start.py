@@ -1044,7 +1044,7 @@ async def message_capture(client: Client, message: Message):
 
                     user = message.from_user
                     await safe_action(
-                        client.send_message
+                        client.send_message,
                         ADMINS,
                         f"📢 <b>New Payment Verified</b>\n\n"
                         f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
