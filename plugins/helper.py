@@ -11,25 +11,10 @@ from plugins.database import *
 
 CLONE_ME = {}
 
-X1_CHANNEL = None
-X2_CHANNEL = None
-X3_CHANNEL = None
-
-async def load_channels():
-    from plugins.database import db
-    global X1_CHANNEL, X2_CHANNEL, X3_CHANNEL
-
-    data = await db.get_channels()
-    X1_CHANNEL = int(data.get("x1"))
-    X2_CHANNEL = int(data.get("x2"))
-    X3_CHANNEL = int(data.get("x3"))
-
 async def set_auto_menu(client):
     try:
         owner_cmds = [
             BotCommand("start", "Check I am alive"),
-            BotCommand("setchannel", "Set a channel"),
-            BotCommand("getchannels", "Get all channels"),
             BotCommand("broadcast", "Broadcast a message to users"),
             BotCommand("stats", "View bot statistics"),
         ]

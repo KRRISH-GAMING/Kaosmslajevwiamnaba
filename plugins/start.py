@@ -69,48 +69,6 @@ async def start(client, message):
         print(f"⚠️ Start Handler Error: {e}")
         print(traceback.format_exc())
 
-@Client.on_message(filters.command("setchannel") & filters.user(ADMINS))
-async def set_channel_cmd(client, message):
-    try:
-        parts = message.text.split(maxsplit=2)
-        if len(parts) < 3:
-            return await message.reply_text("Usage:\n`/setchannel <x1/x2/x3> <channel_id>`", parse_mode=enums.ParseMode.MARKDOWN)
-
-        name = parts[1].lower()
-        value = int(parts[2])
-
-        await db.update_channel(name, value)
-
-        global X1_CHANNEL, X2_CHANNEL, X3_CHANNEL
-        if name == "x1":
-            X1_CHANNEL = value
-        elif name == "x2":
-            X2_CHANNEL = value
-        elif name == "x3":
-            X3_CHANNEL = value
-        else:
-            return await message.reply_text("❌ Invalid channel name!")
-
-        await message.reply_text(f"✅ Updated **{name.upper()}_CHANNEL** to `{value}` (saved in DB)", parse_mode=enums.ParseMode.MARKDOWN)
-    except Exception as e:
-        await safe_action(
-            client.send_message,
-            LOG_CHANNEL,
-            f"⚠️ Set Channel Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
-        )
-        print(f"⚠️ Set Channel Error: {e}")
-        print(traceback.format_exc())
-
-@Client.on_message(filters.command("getchannels") & filters.user(ADMINS))
-async def get_channels_cmd(client, message):
-    text = f"""📡 <b>Current Channels:</b>
-    
-💰 Payment:
-📢 X1: <code>{X1_CHANNEL}</code>
-📢 X2: <code>{X2_CHANNEL}</code>
-📢 X3: <code>{X3_CHANNEL}</code>"""
-    await message.reply_text(text)
-
 @Client.on_message(filters.command("broadcast") & filters.private & filters.user(ADMINS))
 async def broadcast(client, message):
     global broadcast_cancel
@@ -249,34 +207,23 @@ async def stats(client, message):
 
 PLAN_CHANNEL_MAP = {
     # Desi/Onlyfans
-    "y1p1": X1_CHANNEL,
-    "y1p2": X1_CHANNEL,
-    "y1p3": X1_CHANNEL,
-    "y1p4": X1_CHANNEL,
-
-    # Insta/Snap
-    "y2p1": -1009876543210,
-    "y2p2": -1009876543210,
-    "y2p3": -1009876543210,
-    "y2p4": -1009876543210,
+    "y1p1": -1003246924678,
+    "y1p2": -1003246924678,
+    "y1p3": -1003246924678,
+    "y1p4": -1003246924678,
 
     # Cp/Rp
-    "y3p1": X2_CHANNEL,
-    "y3p2": X2_CHANNEL,
-    "y3p3": X2_CHANNEL,
-    "y3p4": X2_CHANNEL,
+    "y2p1": -1003238391861,
+    "y2p2": -1003238391861,
+    "y2p3": -1003238391861,
+    "y2p4": -1003238391861,
 
     # Mega Collection
-    "y4p1": X3_CHANNEL,
-    "y4p2": X3_CHANNEL,
-    "y4p3": X3_CHANNEL,
-    "y4p4": X3_CHANNEL,
+    "y3p1": -1003130577319,
+    "y3p2": -1003130577319,
+    "y3p3": -1003130577319,
+    "y3p4": -1003130577319,
 
-    # All Collection
-    "y5p1": -1006677889900,
-    "y5p2": -1006677889900,
-    "y5p3": -1006677889900,
-    "y5p4": -1006677889900,
 }
 
 @Client.on_callback_query()
@@ -313,14 +260,9 @@ async def callback(client, query):
         # Plans
         elif data == "x1":
             buttons = [
-                #[InlineKeyboardButton("🎬 Desi/Onlyfans Collection", callback_data="y1")],
-                #[InlineKeyboardButton("📸 Insta/Snap Collection", callback_data="y2")],
-                #[InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="y3")],
-                #[InlineKeyboardButton("🚀 Mega Collection", callback_data="y4")],
-                #[InlineKeyboardButton("📦 All Collection", callback_data="y5")],
                 [InlineKeyboardButton("🎬 Mixed Collection", callback_data="y1")],
-                [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="y3")],
-                [InlineKeyboardButton("🚀 Mega Collection", callback_data="y4")],
+                [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="y2")],
+                [InlineKeyboardButton("🚀 Mega Collection", callback_data="y3")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x0")]
             ]
             await safe_action(
@@ -461,21 +403,21 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y2":
             buttons = [
-                [InlineKeyboardButton("🔥 Preview", url="https://t.me/c/2937162790/22885")],
-                [InlineKeyboardButton("💰 ₹150 - 1️⃣ Month", callback_data="y2p1")],
-                [InlineKeyboardButton("💰 ₹250 - 3️⃣ Month", callback_data="y2p2")],
-                [InlineKeyboardButton("💰 ₹350 - 6️⃣ Month", callback_data="y2p3")],
-                [InlineKeyboardButton("💰 ₹550 - Lifetime", callback_data="y2p4")],
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlMjgzMjdkMTAyNjk2YjIxNzE4")],
+                [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y2p1")],
+                [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y2p2")],
+                [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y2p3")],
+                [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y2p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(
                 query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "\n•1 Month: ₹150"
-                    "\n•3 Months: ₹250"
-                    "\n•6 Months: ₹350"
-                    "\n•Lifetime: ₹550"
+                    "\n•1 Month: ₹200"
+                    "\n•3 Months: ₹400"
+                    "\n•6 Months: ₹600"
+                    "\n•Lifetime: ₹1000"
                     "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -485,10 +427,10 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y2p"):
             price_map = {
-                "y2p1": ("₹150", "1️⃣ Month"),
-                "y2p2": ("₹250", "3️⃣ Month"),
-                "y2p3": ("₹350", "6️⃣ Month"),
-                "y2p4": ("₹550", "Lifetime")
+                "y2p1": ("₹200", "1️⃣ Month"),
+                "y2p2": ("₹400", "3️⃣ Month"),
+                "y2p3": ("₹600", "6️⃣ Month"),
+                "y2p4": ("₹1000", "Lifetime")
             }
 
             price, duration = price_map[data]
@@ -503,7 +445,7 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"📸 Insta/Snap Collection\n\n"
+                f"🕵️‍♂️ Cp/Rp Collection\n\n"
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
@@ -526,10 +468,10 @@ async def callback(client, query):
         elif data.startswith("paid2_"):
             plan_key = data.replace("paid2_", "")
             plan_map = {
-                "y2p1": ("₹150", "1️⃣ Month"),
-                "y2p2": ("₹250", "3️⃣ Month"),
-                "y2p3": ("₹350", "6️⃣ Month"),
-                "y2p4": ("₹550", "Lifetime")
+                "y2p1": ("₹200", "1️⃣ Month"),
+                "y2p2": ("₹400", "3️⃣ Month"),
+                "y2p3": ("₹600", "6️⃣ Month"),
+                "y2p4": ("₹1000", "Lifetime")
             }
 
             if plan_key not in plan_map:
@@ -586,11 +528,11 @@ async def callback(client, query):
         # Demo & Price
         elif data == "y3":
             buttons = [
-                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlMjgzMjdkMTAyNjk2YjIxNzE4")],
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlZDIzMjdkMTAyNjk2YjIxNzI0")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y3p1")],
-                [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y3p2")],
-                [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y3p3")],
-                [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y3p4")],
+                [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y3p2")],
+                [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y3p3")],
+                [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y3p4")],
                 [InlineKeyboardButton("🔙 Back", callback_data="x1")]
             ]
             await safe_action(
@@ -628,7 +570,7 @@ async def callback(client, query):
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
             caption = (
-                f"🕵️‍♂️ Cp/Rp Collection\n\n"
+                f"🚀 Mega Collection\n\n"
                 f"Selected Plan: {duration}\n"
                 f"Price: {price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
@@ -655,256 +597,6 @@ async def callback(client, query):
                 "y3p2": ("₹400", "3️⃣ Month"),
                 "y3p3": ("₹600", "6️⃣ Month"),
                 "y3p4": ("₹1000", "Lifetime")
-            }
-
-            if plan_key not in plan_map:
-                return await query.message.edit_text("⚠️ Invalid plan key.")
-
-            price, duration = plan_map[plan_key]
-            amount_expected = int(price.replace("₹", ""))
-
-            await safe_action(
-                query.message.edit_text,
-                text=(
-                    f"🔍 Checking payment status...\n\n"
-                    f"Feature: {duration}\n"
-                    f"💰 Amount: ₹{amount_expected}\n"
-                    f"⚡ Please wait while we verify your transaction."
-                ),
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-
-            now = datetime.utcnow()
-
-            matched_payment = None
-            for txn in PAYMENT_CACHE.values():
-                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
-                    matched_payment = txn
-                    break
-
-            if matched_payment:
-                matched_payment["used_for"] = plan_key
-
-                PENDING_TXN[query.from_user.id] = {
-                    "duration": duration,
-                    "amount_expected": amount_expected,
-                    "txn_expected": matched_payment["txn_id"],
-                    "callback_message": query.message,
-                    "plan_key": plan_key
-                }
-
-                await safe_action(
-                    query.message.edit_text,
-                    f"✅ Payment detected for ₹{amount_expected}!\n\n"
-                    "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
-                    parse_mode=enums.ParseMode.MARKDOWN
-                )
-            else:
-                await safe_action(
-                    query.message.edit_text,
-                    f"❌ No new payment found for ₹{amount_expected}.\n\n"
-                    "Make sure your transaction is completed and try again after 1 minute.",
-                    parse_mode=enums.ParseMode.MARKDOWN
-                )
-            await safe_action(query.answer)
-
-        # Demo & Price
-        elif data == "y4":
-            buttons = [
-                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlZDIzMjdkMTAyNjk2YjIxNzI0")],
-                [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y4p1")],
-                [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y4p2")],
-                [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y4p3")],
-                [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y4p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
-            ]
-            await safe_action(
-                query.message.edit_text,
-                text=(
-                    "Available Plans👇🏻"
-                    "\n•1 Month: ₹200"
-                    "\n•3 Months: ₹400"
-                    "\n•6 Months: ₹600"
-                    "\n•Lifetime: ₹1000"
-                    "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
-                ),
-                reply_markup=InlineKeyboardMarkup(buttons)
-            )
-            await safe_action(query.answer)
-
-        # Payment menu when a price is selected
-        elif data.startswith("y4p"):
-            price_map = {
-                "y4p1": ("₹200", "1️⃣ Month"),
-                "y4p2": ("₹400", "3️⃣ Month"),
-                "y4p3": ("₹600", "6️⃣ Month"),
-                "y4p4": ("₹1000", "Lifetime")
-            }
-
-            price, duration = price_map[data]
-
-            buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid4_{data}")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y4")]
-            ]
-
-            upi_id = "krrishmehta@airtel"
-            upi_name = "KM Membership Bot"
-            qr_image = generate_upi_qr(upi_id, upi_name, price)
-
-            caption = (
-                f"🚀 Mega Collection\n\n"
-                f"Selected Plan: {duration}\n"
-                f"Price: {price}\n"
-                f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ Payment Done."
-            )
-
-            await safe_action(query.message.delete)
-
-            await safe_action(
-                client.send_photo,
-                chat_id=query.message.chat.id,
-                photo=qr_image,
-                caption=caption,
-                reply_markup=InlineKeyboardMarkup(buttons),
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-            await safe_action(query.answer)
-
-        # User clicked Payment Done
-        elif data.startswith("paid4_"):
-            plan_key = data.replace("paid4_", "")
-            plan_map = {
-                "y4p1": ("₹200", "1️⃣ Month"),
-                "y4p2": ("₹400", "3️⃣ Month"),
-                "y4p3": ("₹600", "6️⃣ Month"),
-                "y4p4": ("₹1000", "Lifetime")
-            }
-
-            if plan_key not in plan_map:
-                return await query.message.edit_text("⚠️ Invalid plan key.")
-
-            price, duration = plan_map[plan_key]
-            amount_expected = int(price.replace("₹", ""))
-
-            await safe_action(
-                query.message.edit_text,
-                text=(
-                    f"🔍 Checking payment status...\n\n"
-                    f"Feature: {duration}\n"
-                    f"💰 Amount: ₹{amount_expected}\n"
-                    f"⚡ Please wait while we verify your transaction."
-                ),
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-
-            now = datetime.utcnow()
-
-            matched_payment = None
-            for txn in PAYMENT_CACHE.values():
-                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
-                    matched_payment = txn
-                    break
-
-            if matched_payment:
-                matched_payment["used_for"] = plan_key
-
-                PENDING_TXN[query.from_user.id] = {
-                    "duration": duration,
-                    "amount_expected": amount_expected,
-                    "txn_expected": matched_payment["txn_id"],
-                    "callback_message": query.message,
-                    "plan_key": plan_key
-                }
-
-                await safe_action(
-                    query.message.edit_text,
-                    f"✅ Payment detected for ₹{amount_expected}!\n\n"
-                    "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
-                    parse_mode=enums.ParseMode.MARKDOWN
-                )
-            else:
-                await safe_action(
-                    query.message.edit_text,
-                    f"❌ No new payment found for ₹{amount_expected}.\n\n"
-                    "Make sure your transaction is completed and try again after 1 minute.",
-                    parse_mode=enums.ParseMode.MARKDOWN
-                )
-            await safe_action(query.answer)
-
-        # Demo & Price
-        elif data == "y5":
-            buttons = [
-                [InlineKeyboardButton("🔥 Preview", url="https://t.me/c/2937162790/22885")],
-                [InlineKeyboardButton("💰 ₹250 - 1️⃣ Month", callback_data="y5p1")],
-                [InlineKeyboardButton("💰 ₹450 - 3️⃣ Month", callback_data="y5p2")],
-                [InlineKeyboardButton("💰 ₹650 - 6️⃣ Month", callback_data="y5p3")],
-                [InlineKeyboardButton("💰 ₹1050 - Lifetime", callback_data="y5p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
-            ]
-            await safe_action(
-                query.message.edit_text,
-                text=(
-                    "Available Plans👇🏻"
-                    "\n• 1 Month: ₹250"
-                    "\n•3 Months: ₹450"
-                    "\n•6 Months: ₹650"
-                    "\n•Lifetime: ₹1050"
-                    "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
-                ),
-                reply_markup=InlineKeyboardMarkup(buttons)
-            )
-            await safe_action(query.answer)
-
-        # Payment menu when a price is selected
-        elif data.startswith("y5p"):
-            price_map = {
-                "y5p1": ("₹250", "1️⃣ Month"),
-                "y5p2": ("₹450", "3️⃣ Month"),
-                "y5p3": ("₹650", "6️⃣ Month"),
-                "y5p4": ("₹1050", "Lifetime")
-            }
-
-            price, duration = price_map[data]
-
-            buttons = [
-                [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid5_{data}")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y5")]
-            ]
-
-            upi_id = "krrishmehta@airtel"
-            upi_name = "KM Membership Bot"
-            qr_image = generate_upi_qr(upi_id, upi_name, price)
-
-            caption = (
-                f"📦 All Collection\n\n"
-                f"Selected Plan: {duration}\n"
-                f"Price: {price}\n"
-                f"UPI ID: `{upi_id}` \n\n"
-                f"Once you pay, click ✅ Payment Done."
-            )
-
-            await safe_action(query.message.delete)
-
-            await safe_action(
-                client.send_photo,
-                chat_id=query.message.chat.id,
-                photo=qr_image,
-                caption=caption,
-                reply_markup=InlineKeyboardMarkup(buttons),
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-            await safe_action(query.answer)
-
-        # User clicked Payment Done
-        elif data.startswith("paid5_"):
-            plan_key = data.replace("paid5_", "")
-            plan_map = {
-                "y5p1": ("₹250", "1️⃣ Month"),
-                "y5p2": ("₹450", "3️⃣ Month"),
-                "y5p3": ("₹650", "6️⃣ Month"),
-                "y5p4": ("₹1050", "Lifetime")
             }
 
             if plan_key not in plan_map:
