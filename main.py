@@ -19,7 +19,6 @@ class Bot(Client):
         await super().start()
         me = await self.get_me()
         self.username = '@' + me.username
-        await load_channels()
         await set_auto_menu(self)
         print('Bot Started.')
 
