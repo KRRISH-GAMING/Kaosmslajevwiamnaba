@@ -702,7 +702,6 @@ async def message_capture(client: Client, message: Message):
 
         chat = message.chat
         user_id = message.from_user.id if message.from_user else None
-        is_admin = user_id in ADMINS
 
         if chat.type == enums.ChatType.PRIVATE and user_id:
             if not (
@@ -746,19 +745,20 @@ async def message_capture(client: Client, message: Message):
                     )
 
                     # 🧾 Notify admin
-                    await safe_action(
-                        client.send_message,
-                        is_admin,
-                        f"📢 <b>New Payment Verified</b>\n\n"
-                        f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
-                        f"💬 <b>Username:</b> @{user.username or 'None'}\n"
-                        f"💰 <b>Amount:</b> ₹{amount_expected}\n"
-                        f"🕒 <b>Duration:</b> {duration}\n"
-                        f"🧾 <b>Txn ID:</b> <code>{expected_txn}</code>\n"
-                        f"🎫 <b>Plan:</b> {plan_key}\n"
-                        f"🔗 <b>Invite Link:</b> {invite.invite_link}",
-                        parse_mode=enums.ParseMode.HTML
-                    )
+                    for admin_id in ADMINS:
+                        await safe_action(
+                            client.send_message,
+                            admin_id,
+                            f"📢 <b>New Payment Verified</b>\n\n"
+                            f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
+                            f"💬 <b>Username:</b> @{user.username or 'None'}\n"
+                            f"💰 <b>Amount:</b> ₹{amount_expected}\n"
+                            f"🕒 <b>Duration:</b> {duration}\n"
+                            f"🧾 <b>Txn ID:</b> <code>{expected_txn}</code>\n"
+                            f"🎫 <b>Plan:</b> {plan_key}\n"
+                            f"🔗 <b>Invite Link:</b> {invite.invite_link}",
+                            parse_mode=enums.ParseMode.HTML
+                        )
 
                     # 💬 Send link to user
                     await safe_action(
