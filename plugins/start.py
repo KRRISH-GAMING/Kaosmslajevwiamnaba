@@ -289,7 +289,7 @@ async def callback(client, query):
                 query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "\n•1 Month: ₹1"
+                    "\n•1 Month: ₹100"
                     "\n•3 Months: ₹200"
                     "\n•6 Months: ₹300"
                     "\n•Lifetime: ₹500"
@@ -772,7 +772,7 @@ async def message_capture(client: Client, message: Message):
                         f"🎫 Plan: {plan_key}\n"
                         f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                         f"⚠️ This link will expire automatically after you join.",
-                        parse_mode=enums.ParseMode.MARKDOWN
+                        parse_mode=enums.ParseMode.HTML
                     )
 
                     # 🔒 Revoke invite after short delay
@@ -788,7 +788,7 @@ async def message_capture(client: Client, message: Message):
                     # ---------------- EXPIRE TIME SETUP ----------------
                     expiry_date = None
                     if "1" in duration:
-                        expiry_date = datetime.utcnow() + timedelta(days=30)
+                        expiry_date = datetime.utcnow() + timedelta(minutes=1)
                     elif "3" in duration:
                         expiry_date = datetime.utcnow() + timedelta(days=90)
                     elif "6" in duration:
