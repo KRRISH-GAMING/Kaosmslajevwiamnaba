@@ -79,7 +79,7 @@ def generate_upi_qr(upi_id: str, name: str, amount: float) -> BytesIO:
     qr.add_data(upi_url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
-
+    
     bio = BytesIO()
     bio.name = "upi_qr.png"
     img.save(bio, "PNG")
@@ -89,35 +89,43 @@ def generate_upi_qr(upi_id: str, name: str, amount: float) -> BytesIO:
 async def fetch_fampay_payments():
     try:
         IMAP_HOST = "imap.gmail.com"
-        IMAP_USER = str("krrishraj237@gmail.com")
-        IMAP_PASS = str("ewcz wblx fdgv unpp")
+        IMAP_USER = "krrishraj237@gmail.com"
+        IMAP_PASS = "ewcz wblx fdgv unpp"
 
         mail = imaplib.IMAP4_SSL(IMAP_HOST)
         mail.login(IMAP_USER, IMAP_PASS)
+
         mail.select("inbox")
 
         status, email_ids = mail.search(None, '(UNSEEN FROM "no-reply@famapp.in")')
+
         if status != "OK" or not email_ids or not email_ids[0]:
             return []
 
-        email_list = email_ids[0].split()[-5:]  # latest 5 unseen
+        email_list = email_ids[0].split()
+
+        latest_5_emails = email_list[-5:]
+
         transactions = []
         kolkata_tz = pytz.timezone("Asia/Kolkata")
 
-        for email_id in email_list:
+        for email_id in latest_5_emails:
             status, msg_data = mail.fetch(email_id, "(RFC822)")
+
             if status != "OK" or not msg_data:
                 continue
 
             raw_email = msg_data[0][1]
             msg = email.message_from_bytes(raw_email)
+
             email_date = msg["Date"]
 
             try:
                 email_datetime = datetime.strptime(email_date, "%a, %d %b %Y %H:%M:%S %z")
-                email_datetime = email_datetime.astimezone(kolkata_tz)
-            except:
+            except ValueError as ve:
                 continue
+
+            email_datetime = email_datetime.astimezone(kolkata_tz)
 
             body = ""
             if msg.is_multipart():
@@ -128,23 +136,29 @@ async def fetch_fampay_payments():
             else:
                 body = msg.get_payload(decode=True).decode(errors="ignore")
 
-            # Extract ₹amount and FMBPI Txn ID
-            amount_match = re.search(r"₹\s?([\d,.]+)", body)
-            txn_match = re.search(r"(FMBPI\w+)", body)
-            if not amount_match or not txn_match:
+            if not body:
                 continue
 
-            amount = float(amount_match.group(1).replace(",", ""))
-            txn_id = txn_match.group(1)
+            amount_match = re.search(r"₹\s?([\d,.]+)", body)
+            if amount_match:
+                amount = float(amount_match.group(1).replace(",", ""))
+            else:
+                amount = None
 
-            transactions.append({
+            txn_match = re.search(r"transaction id\s*[:\-]?\s*(\w+)", body, re.I)
+            txn_id = txn_match.group(1) if txn_match else None
+
+            if not amount or not txn_id:
+                continue
+
+            txn = {
                 "date": email_datetime.strftime("%Y-%m-%d %H:%M:%S"),
                 "amount": amount,
-                "txn_id": txn_id,
-                "time": email_datetime
-            })
+                "txn_id": txn_id
+            }
+            transactions.append(txn)
 
-            mail.store(email_id, '+FLAGS', '\\Seen')  # mark as read
+            mail.store(email_id, '+FLAGS', '\\Seen')
 
         mail.logout()
         return transactions
@@ -153,27 +167,11 @@ async def fetch_fampay_payments():
         await safe_action(
             client.send_message,
             LOG_CHANNEL,
-            f"⚠️ IMAP Error:\n<code>{e}</code>\n\n<code>{traceback.format_exc()}</code>"
+            f"⚠️ IMAP Error:\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
         print(f"⚠️ IMAP Error: {e}")
         print(traceback.format_exc())
         return []
-
-async def verify_auto_payment(expected_amount: int, retries=4, delay=30, time_window_minutes=10):
-    kolkata_tz = pytz.timezone("Asia/Kolkata")
-    for attempt in range(retries):
-        transactions = await fetch_fampay_payments()
-        if transactions:
-            now = datetime.now(kolkata_tz)
-            for txn in transactions:
-                diff = (now - txn["time"]).total_seconds() / 60
-                if diff <= time_window_minutes and abs(txn["amount"] - expected_amount) < 2:
-                    return txn["txn_id"]
-
-        if attempt < retries - 1:
-            await asyncio.sleep(delay)
-
-    return None
 
 def broadcast_progress_bar(done: int, total: int) -> str:
     try:
