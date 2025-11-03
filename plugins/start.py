@@ -205,6 +205,19 @@ async def stats(client, message):
         print(f"⚠️ Stats Error: {e}")
         print(traceback.format_exc())
 
+PLAN_CATEGORY_MAP = {
+    "y1": "Mixed Collection",
+    "y2": "CP/RP Collection",
+    "y3": "Mega Collection"
+}
+
+PLAN_DURATION_MAP = {
+    "p1": "1 Month",
+    "p2": "3 Months",
+    "p3": "6 Months",
+    "p4": "Lifetime"
+}
+
 PLAN_CHANNEL_MAP = {
     # Desi/Onlyfans
     "y1p1": -1003246924678,
@@ -223,7 +236,6 @@ PLAN_CHANNEL_MAP = {
     "y3p2": -1003130577319,
     "y3p3": -1003130577319,
     "y3p4": -1003130577319,
-
 }
 
 @Client.on_callback_query()
@@ -725,6 +737,14 @@ async def message_capture(client: Client, message: Message):
                 callback_message = data["callback_message"]
                 plan_key = data.get("plan_key")
 
+                # 🔍 Decode Plan Name Nicely
+                category_code = plan_key[:2]      # e.g. y1
+                duration_code = plan_key[-2:]     # e.g. p1
+
+                plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
+                plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
+                plan_name = f"{plan_category} – {plan_duration}"
+
                 if new_text == expected_txn:
                     channel_id = PLAN_CHANNEL_MAP.get(plan_key)
                     if not channel_id:
@@ -755,7 +775,7 @@ async def message_capture(client: Client, message: Message):
                             f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                             f"🕒 <b>Duration:</b> {duration}\n"
                             f"🧾 <b>Txn ID:</b> <code>{expected_txn}</code>\n"
-                            f"🎫 <b>Plan:</b> {plan_key}\n"
+                            f"🎫 <b>Plan:</b> {plan_name}\n"
                             f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                             parse_mode=enums.ParseMode.HTML
                         )
@@ -769,7 +789,7 @@ async def message_capture(client: Client, message: Message):
                         f"💰 Amount: ₹{amount_expected}\n"
                         f"🕒 Duration: {duration}\n"
                         f"🧾 Txn ID: <code>{expected_txn}</code>\n"
-                        f"🎫 Plan: {plan_key}\n"
+                        f"🎫 Plan: {plan_name}\n"
                         f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                         f"⚠️ This link will expire automatically after you join.",
                         parse_mode=enums.ParseMode.HTML
@@ -788,7 +808,7 @@ async def message_capture(client: Client, message: Message):
                     # ---------------- EXPIRE TIME SETUP ----------------
                     expiry_date = None
                     if "1" in duration:
-                        expiry_date = datetime.utcnow() + timedelta(minutes=1)
+                        expiry_date = datetime.utcnow() + timedelta(days=30)
                     elif "3" in duration:
                         expiry_date = datetime.utcnow() + timedelta(days=90)
                     elif "6" in duration:
