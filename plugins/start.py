@@ -454,7 +454,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                 "y1p1": (100, "1️⃣ Month"),
+                 "y1p1": (1, "1️⃣ Month"),
                  "y1p2": (200, "3️⃣ Month"),
                  "y1p3": (300, "6️⃣ Month"),
                  "y1p4": (500, "Lifetime")
@@ -497,7 +497,7 @@ async def callback(client, query):
 
             plan_key = data.replace("paid1_", "")
             plan_map = {
-                "y1p1": (100, "1️⃣ Month"),
+                "y1p1": (1, "1️⃣ Month"),
                 "y1p2": (200, "3️⃣ Month"),
                 "y1p3": (300, "6️⃣ Month"),
                 "y1p4": (500, "Lifetime")
