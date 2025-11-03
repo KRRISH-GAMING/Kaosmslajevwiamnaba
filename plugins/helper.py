@@ -79,7 +79,7 @@ def generate_upi_qr(upi_id: str, name: str, amount: float) -> BytesIO:
     qr.add_data(upi_url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
-    
+
     bio = BytesIO()
     bio.name = "upi_qr.png"
     img.save(bio, "PNG")
@@ -89,8 +89,8 @@ def generate_upi_qr(upi_id: str, name: str, amount: float) -> BytesIO:
 async def fetch_fampay_payments():
     try:
         IMAP_HOST = "imap.gmail.com"
-        IMAP_USER = "krrishraj237@gmail.com"
-        IMAP_PASS = "ewcz wblx fdgv unpp"
+        IMAP_USER = str("krrishraj237@gmail.com")
+        IMAP_PASS = str("ewcz wblx fdgv unpp")
 
         mail = imaplib.IMAP4_SSL(IMAP_HOST)
         mail.login(IMAP_USER, IMAP_PASS)
@@ -144,8 +144,7 @@ async def fetch_fampay_payments():
                 "time": email_datetime
             })
 
-            # Mark email as read
-            mail.store(email_id, '+FLAGS', '\\Seen')
+            mail.store(email_id, '+FLAGS', '\\Seen')  # mark as read
 
         mail.logout()
         return transactions
@@ -172,7 +171,7 @@ async def verify_auto_payment(expected_amount: int, retries=4, delay=30, time_wi
                     return txn["txn_id"]
 
         if attempt < retries - 1:
-            await asyncio.sleep(delay)  # wait and retry
+            await asyncio.sleep(delay)
 
     return None
 

@@ -454,10 +454,10 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹1", "1️⃣ Month"),
-                "y1p2": ("₹200", "3️⃣ Month"),
-                "y1p3": ("₹300", "6️⃣ Month"),
-                "y1p4": ("₹500", "Lifetime")
+                 "y1p1": (100, "1️⃣ Month"),
+                 "y1p2": (200, "3️⃣ Month"),
+                 "y1p3": (300, "6️⃣ Month"),
+                 "y1p4": (500, "Lifetime")
             }
 
             price, duration = price_map[data]
@@ -474,7 +474,7 @@ async def callback(client, query):
             caption = (
                 f"🎬 Mixed Collection\n\n"
                 f"Selected Plan: {duration}\n"
-                f"Price: {price}\n"
+                f"Price: ₹{price}\n"
                 f"UPI ID: `{upi_id}` \n\n"
                 f"Once you pay, click ✅ Payment Done."
             )
@@ -493,19 +493,20 @@ async def callback(client, query):
 
         # User clicked Payment Done
         elif data.startswith("paid1_"):
+            await query.answer("⏳ Please wait, verifying payment...", show_alert=False)
+
             plan_key = data.replace("paid1_", "")
             plan_map = {
-                "y1p1": ("₹1", "1️⃣ Month"),
-                "y1p2": ("₹200", "3️⃣ Month"),
-                "y1p3": ("₹300", "6️⃣ Month"),
-                "y1p4": ("₹500", "Lifetime")
+                "y1p1": (100, "1️⃣ Month"),
+                "y1p2": (200, "3️⃣ Month"),
+                "y1p3": (300, "6️⃣ Month"),
+                "y1p4": (500, "Lifetime")
             }
 
             if plan_key not in plan_map:
                 return await query.message.edit_text("⚠️ Invalid plan key.")
 
-            price, duration = plan_map[plan_key]
-            amount_expected = int(price.replace("₹", ""))
+            amount_expected, duration = plan_map[plan_key]
 
             await safe_action(
                 query.message.edit_text,
@@ -518,9 +519,9 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-            transactions = await verify_auto_payment(amount_expected)
+            txn_id = await verify_auto_payment(amount_expected)
 
-            if transactions:
+            if txn_id:
                 await safe_action(
                     query.message.edit_text,
                     f"✅ Payment Verified Successfully!\n\n"
@@ -529,27 +530,14 @@ async def callback(client, query):
                     f"Processing your premium access..."
                 )
 
-                # 🔍 Decode Plan Name Nicely
-                category_code = plan_key[:2]      # e.g. y1
-                duration_code = plan_key[-2:]     # e.g. p1
-
-                plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
-                plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
-                plan_name = f"{plan_category} – {plan_duration}"
-
-                channel_id = await db.get_plan_channel(plan_key)
+                # ---- Assign Channel + Duration ----
+                channel_id = PLAN_CHANNEL_MAP.get(plan_key)
                 if not channel_id:
-                    channel_id = PLAN_CHANNEL_MAP.get(plan_key)
-                    if not channel_id:
-                        await safe_action(
-                            query.message.edit_text,
-                            "⚠️ No channel assigned for this plan. Contact admin."
-                        )
-                        return
+                    await safe_action(query.message.edit_text, "⚠️ No channel assigned for this plan. Contact admin.")
+                    return
 
-                user = message.from_user
+                user = query.from_user
 
-                # ✅ Create invite link
                 invite = await client.create_chat_invite_link(
                     chat_id=channel_id,
                     name=f"Access for {user.first_name}",
@@ -557,46 +545,33 @@ async def callback(client, query):
                     member_limit=1
                 )
 
-                # 🧾 Notify admin
+                # ---- Notify Admin ----
                 for admin_id in ADMINS:
                     await safe_action(
                         client.send_message,
                         admin_id,
                         f"📢 <b>New Payment Verified</b>\n\n"
                         f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
-                        f"💬 <b>Username:</b> @{user.username or 'None'}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                         f"🕒 <b>Duration:</b> {duration}\n"
-                        f"🎫 <b>Plan:</b> {plan_name}\n"
+                        f"🆔 <b>Txn ID:</b> <code>{txn_id}</code>\n"
                         f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                         parse_mode=enums.ParseMode.HTML
                     )
 
-                # 💬 Send link to user
+                # ---- Send to User ----
                 await safe_action(
                     query.message.edit_text,
                     f"✅ Payment verified!\n\n"
-                    f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
-                    f"💬 Username: @{user.username or 'None'}\n"
-                    f"💰 Amount: ₹{amount_expected}\n"
-                    f"🕒 Duration: {duration}\n"
-                    f"🎫 Plan: {plan_name}\n"
-                    f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
-                    f"⚠️ This link will expire automatically after you join.",
+                    f"👤 {user.mention}\n"
+                    f"💰 ₹{amount_expected}\n"
+                    f"🕒 {duration}\n"
+                    f"🆔 Txn: <code>{txn_id}</code>\n"
+                    f"🎟️ Join using this link (valid 1 hour):\n{invite.invite_link}",
                     parse_mode=enums.ParseMode.HTML
                 )
 
-                # 🔒 Revoke invite after short delay
-                async def revoke_after_join():
-                    await asyncio.sleep(60)
-                    try:
-                        await client.revoke_chat_invite_link(channel_id, invite.invite_link)
-                    except Exception:
-                        pass
-
-                asyncio.create_task(revoke_after_join())
-
-                # ---------------- EXPIRE TIME SETUP ----------------
+                # ---- Expiry Setup ----
                 expiry_date = None
                 if "1" in duration:
                     expiry_date = datetime.utcnow() + timedelta(days=30)
@@ -604,14 +579,10 @@ async def callback(client, query):
                     expiry_date = datetime.utcnow() + timedelta(days=90)
                 elif "6" in duration:
                     expiry_date = datetime.utcnow() + timedelta(days=180)
-                elif "Life" in duration or "life" in duration:
-                    expiry_date = None
 
-                # 💾 Save to DB (only if timed plan)
                 if expiry_date:
                     await db.update_subscription(user.id, plan_key, channel_id, expiry_date)
 
-                    # 💤 Auto kick user after expiry
                     async def auto_kick_user():
                         await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
                         try:
@@ -629,13 +600,13 @@ async def callback(client, query):
                             print(f"Failed to kick {user.id}: {e}")
 
                     asyncio.create_task(auto_kick_user())
+
             else:
                 await safe_action(
                     query.message.edit_text,
                     "❌ No matching payment found.\n\n"
                     "Please make sure you’ve completed payment and try again in a minute."
                 )
-            await safe_action(query.answer)
 
         # Demo & Price
         elif data == "y2":
