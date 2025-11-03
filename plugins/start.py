@@ -289,7 +289,7 @@ async def callback(client, query):
                 query.message.edit_text,
                 text=(
                     "Available Plans👇🏻"
-                    "\n•1 Month: ₹100"
+                    "\n•1 Month: ₹1"
                     "\n•3 Months: ₹200"
                     "\n•6 Months: ₹300"
                     "\n•Lifetime: ₹500"
@@ -302,7 +302,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -343,7 +343,7 @@ async def callback(client, query):
         elif data.startswith("paid1_"):
             plan_key = data.replace("paid1_", "")
             plan_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -427,7 +427,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y2p"):
             price_map = {
-                "y2p1": ("₹200", "1️⃣ Month"),
+                "y2p1": ("₹2", "1️⃣ Month"),
                 "y2p2": ("₹400", "3️⃣ Month"),
                 "y2p3": ("₹600", "6️⃣ Month"),
                 "y2p4": ("₹1000", "Lifetime")
@@ -468,7 +468,7 @@ async def callback(client, query):
         elif data.startswith("paid2_"):
             plan_key = data.replace("paid2_", "")
             plan_map = {
-                "y2p1": ("₹200", "1️⃣ Month"),
+                "y2p1": ("₹2", "1️⃣ Month"),
                 "y2p2": ("₹400", "3️⃣ Month"),
                 "y2p3": ("₹600", "6️⃣ Month"),
                 "y2p4": ("₹1000", "Lifetime")
@@ -552,7 +552,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y3p"):
             price_map = {
-                "y3p1": ("₹200", "1️⃣ Month"),
+                "y3p1": ("₹2", "1️⃣ Month"),
                 "y3p2": ("₹400", "3️⃣ Month"),
                 "y3p3": ("₹600", "6️⃣ Month"),
                 "y3p4": ("₹1000", "Lifetime")
@@ -593,7 +593,7 @@ async def callback(client, query):
         elif data.startswith("paid3_"):
             plan_key = data.replace("paid3_", "")
             plan_map = {
-                "y3p1": ("₹200", "1️⃣ Month"),
+                "y3p1": ("₹2", "1️⃣ Month"),
                 "y3p2": ("₹400", "3️⃣ Month"),
                 "y3p3": ("₹600", "6️⃣ Month"),
                 "y3p4": ("₹1000", "Lifetime")
@@ -717,8 +717,8 @@ async def message_capture(client: Client, message: Message):
                     pass
 
                 new_text = message.text.strip() if message.text else ""
-
                 data = PENDING_TXN[user_id]
+
                 expected_txn = data["txn_expected"]
                 duration = data["duration"]
                 amount_expected = data["amount_expected"]
@@ -735,6 +735,16 @@ async def message_capture(client: Client, message: Message):
                         return
 
                     user = message.from_user
+
+                    # ✅ Create invite link
+                    invite = await client.create_chat_invite_link(
+                        chat_id=channel_id,
+                        name=f"Access for {user.first_name}",
+                        expire_date=datetime.utcnow() + timedelta(hours=1),
+                        member_limit=1
+                    )
+
+                    # 🧾 Notify admin
                     await safe_action(
                         client.send_message,
                         ADMINS,
@@ -749,13 +759,7 @@ async def message_capture(client: Client, message: Message):
                         parse_mode=enums.ParseMode.HTML
                     )
 
-                    invite = await client.create_chat_invite_link(
-                        chat_id=channel_id,
-                        name=f"Access for {message.from_user.first_name}",
-                        expire_date = datetime.utcnow() + timedelta(hours=1),
-                        member_limit=1
-                    )
-
+                    # 💬 Send link to user
                     await safe_action(
                         callback_message.edit_text,
                         f"✅ Payment verified!\n\n"
@@ -770,6 +774,7 @@ async def message_capture(client: Client, message: Message):
                         parse_mode=enums.ParseMode.MARKDOWN
                     )
 
+                    # 🔒 Revoke invite after short delay
                     async def revoke_after_join():
                         await asyncio.sleep(60)
                         try:
@@ -778,6 +783,41 @@ async def message_capture(client: Client, message: Message):
                             pass
 
                     asyncio.create_task(revoke_after_join())
+
+                    # ---------------- EXPIRE TIME SETUP ----------------
+                    expiry_date = None
+                    if "1" in duration:
+                        expiry_date = datetime.utcnow() + timedelta(days=30)
+                    elif "3" in duration:
+                        expiry_date = datetime.utcnow() + timedelta(days=90)
+                    elif "6" in duration:
+                        expiry_date = datetime.utcnow() + timedelta(days=180)
+                    elif "Life" in duration or "life" in duration:
+                        expiry_date = None
+
+                    # 💾 Save to DB (only if timed plan)
+                    if expiry_date:
+                        await db.update_subscription(user.id, plan_key, channel_id, expiry_date)
+
+                        # 💤 Auto kick user after expiry
+                        async def auto_kick_user():
+                            await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
+                            try:
+                                await client.kick_chat_member(channel_id, user.id)
+                                await client.unban_chat_member(channel_id, user.id)
+                                await db.deactivate_subscription(user.id)
+                                await client.send_message(
+                                    user.id,
+                                    f"⏰ Your {duration} premium access has expired.\n"
+                                    "You’ve been removed from the premium channel.\n\n"
+                                    "To renew, please purchase again.",
+                                    parse_mode=enums.ParseMode.HTML
+                                )
+                            except Exception as e:
+                                print(f"Failed to kick {user.id}: {e}")
+
+                        asyncio.create_task(auto_kick_user())
+
                 else:
                     await safe_action(
                         callback_message.edit_text,

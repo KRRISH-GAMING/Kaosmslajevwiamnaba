@@ -1,5 +1,6 @@
 import motor.motor_asyncio
 from plugins.config import *
+from datetime import datetime
 
 class Database:
 
@@ -27,5 +28,35 @@ class Database:
 
     async def delete_user(self, user_id):
         await self.col.delete_many({"id": int(user_id)})
+
+    async def update_subscription(self, user_id, plan_key, channel_id, expiry):
+        await self.col.update_one(
+            {"id": int(user_id)},
+            {
+                "$set": {
+                    "plan_key": plan_key,
+                    "channel_id": channel_id,
+                    "expiry": expiry.isoformat(),
+                    "active": True
+                }
+            },
+            upsert=True
+        )
+
+    async def get_active_subscriptions(self):
+        now = datetime.utcnow().isoformat()
+        return self.col.find({
+            "active": True,
+            "expiry": {"$gt": now}
+        })
+
+    async def deactivate_subscription(self, user_id):
+        await self.col.update_one(
+            {"id": int(user_id)},
+            {"$set": {"active": False}}
+        )
+
+    async def get_user_subscription(self, user_id):
+        return await self.col.find_one({"id": int(user_id)})
 
 db = Database(DB_URI, DB_NAME)
