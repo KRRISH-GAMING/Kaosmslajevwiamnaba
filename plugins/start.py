@@ -804,7 +804,7 @@ async def message_capture(client: Client, message: Message):
                         async def auto_kick_user():
                             await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
                             try:
-                                await client.kick_chat_member(channel_id, user.id)
+                                await client.ban_chat_member(channel_id, user.id)
                                 await client.unban_chat_member(channel_id, user.id)
                                 await db.deactivate_subscription(user.id)
                                 await client.send_message(
