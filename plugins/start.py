@@ -454,7 +454,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -467,7 +467,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("🔙 Back", callback_data="y1")]
             ]
 
-            upi_id = "krrishmehta@airtel"
+            upi_id = "krishxmehta@fam"
             upi_name = "KM Membership Bot"
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
@@ -495,7 +495,7 @@ async def callback(client, query):
         elif data.startswith("paid1_"):
             plan_key = data.replace("paid1_", "")
             plan_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -518,17 +518,24 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
+            transactions = await fetch_fampay_payments()
+            if not transactions:
+                await safe_action(
+                    query.message.edit_text,
+                    "⚠️ No new payments found.\n\nMake sure you paid and try again in a minute.",
+                    parse_mode=enums.ParseMode.MARKDOWN
+                )
+                return
+
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE.values():
-                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
+            for txn in transactions:
+                if int(txn["amount"]) == amount_expected:
                     matched_payment = txn
                     break
 
             if matched_payment:
-                matched_payment["used_for"] = plan_key
-
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
@@ -592,7 +599,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("🔙 Back", callback_data="y2")]
             ]
 
-            upi_id = "krrishmehta@airtel"
+            upi_id = "krishxmehta@fam"
             upi_name = "KM Membership Bot"
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
@@ -643,17 +650,24 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
+            transactions = await fetch_fampay_payments()
+            if not transactions:
+                await safe_action(
+                    query.message.edit_text,
+                    "⚠️ No new payments found.\n\nMake sure you paid and try again in a minute.",
+                    parse_mode=enums.ParseMode.MARKDOWN
+                )
+                return
+
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE.values():
-                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
+            for txn in transactions:
+                if int(txn["amount"]) == amount_expected:
                     matched_payment = txn
                     break
 
             if matched_payment:
-                matched_payment["used_for"] = plan_key
-
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
@@ -717,7 +731,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("🔙 Back", callback_data="y3")]
             ]
 
-            upi_id = "krrishmehta@airtel"
+            upi_id = "krishxmehta@fam"
             upi_name = "KM Membership Bot"
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
@@ -768,17 +782,24 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
+            transactions = await fetch_fampay_payments()
+            if not transactions:
+                await safe_action(
+                    query.message.edit_text,
+                    "⚠️ No new payments found.\n\nMake sure you paid and try again in a minute.",
+                    parse_mode=enums.ParseMode.MARKDOWN
+                )
+                return
+
             now = datetime.utcnow()
 
             matched_payment = None
-            for txn in PAYMENT_CACHE.values():
-                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
+            for txn in transactions:
+                if int(txn["amount"]) == amount_expected:
                     matched_payment = txn
                     break
 
             if matched_payment:
-                matched_payment["used_for"] = plan_key
-
                 PENDING_TXN[query.from_user.id] = {
                     "duration": duration,
                     "amount_expected": amount_expected,
