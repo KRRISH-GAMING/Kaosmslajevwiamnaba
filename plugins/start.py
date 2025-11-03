@@ -702,6 +702,7 @@ async def message_capture(client: Client, message: Message):
 
         chat = message.chat
         user_id = message.from_user.id if message.from_user else None
+        is_admin = user_id in ADMINS
 
         if chat.type == enums.ChatType.PRIVATE and user_id:
             if not (
@@ -747,7 +748,7 @@ async def message_capture(client: Client, message: Message):
                     # 🧾 Notify admin
                     await safe_action(
                         client.send_message,
-                        ADMINS,
+                        is_admin,
                         f"📢 <b>New Payment Verified</b>\n\n"
                         f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
                         f"💬 <b>Username:</b> @{user.username or 'None'}\n"
@@ -865,7 +866,7 @@ async def message_capture(client: Client, message: Message):
         await safe_action(
             client.send_message,
             LOG_CHANNEL,
-            f"⚠️ Clone message_capture Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+            f"⚠️ message_capture Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
-        print(f"⚠️ Clone message_capture Error: {e}")
+        print(f"⚠️ message_capture Error: {e}")
         print(traceback.format_exc())
