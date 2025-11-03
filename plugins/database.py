@@ -59,4 +59,24 @@ class Database:
     async def get_user_subscription(self, user_id):
         return await self.col.find_one({"id": int(user_id)})
 
+    async def get_active_users_by_category(self, category_prefix):
+        now = datetime.utcnow().isoformat()
+        cursor = self.col.find({
+            "active": True,
+            "expiry": {"$gt": now},
+            "plan_key": {"$regex": f"^{category_prefix}"}
+        })
+        return [user async for user in cursor]
+
+    async def update_plan_channel(self, plan_key, new_channel_id):
+        await self.db.plan_channels.update_one(
+            {"plan_key": plan_key},
+            {"$set": {"channel_id": int(new_channel_id)}},
+            upsert=True
+        )
+
+    async def get_plan_channel(self, plan_key):
+        doc = await self.db.plan_channels.find_one({"plan_key": plan_key})
+        return int(doc["channel_id"]) if doc and "channel_id" in doc else None
+
 db = Database(DB_URI, DB_NAME)

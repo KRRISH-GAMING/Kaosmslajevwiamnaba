@@ -15,8 +15,10 @@ async def set_auto_menu(client):
     try:
         owner_cmds = [
             BotCommand("start", "Check I am alive"),
+            BotCommand("resendlinks", "Resend link to users"),
             BotCommand("broadcast", "Broadcast a message to users"),
             BotCommand("stats", "View bot statistics"),
+            BotCommand("premiumstats", "View bot premium user statistics"),
         ]
         for admin_id in ADMINS:
             await client.set_bot_commands(owner_cmds, scope=BotCommandScopeChat(chat_id=admin_id))

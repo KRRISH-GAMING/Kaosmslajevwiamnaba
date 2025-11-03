@@ -23,6 +23,45 @@ broadcast_cancel = False
 
 START_TIME = pytime.time()
 
+PLAN_CATEGORY_MAP = {
+    "y1": "Mixed Collection",
+    "y2": "CP/RP Collection",
+    "y3": "Mega Collection"
+}
+
+PLAN_DURATION_MAP = {
+    "p1": "1 Month",
+    "p2": "3 Months",
+    "p3": "6 Months",
+    "p4": "Lifetime"
+}
+
+ACTIVE_CHANNELS = {
+    "y1": -1003246924678,  # Mixed Collection
+    "y2": -1003238391861,  # CP/RP
+    "y3": -1003130577319   # Mega
+}
+
+PLAN_CHANNEL_MAP = {
+    # Desi/Onlyfans
+    "y1p1": -1003246924678,
+    "y1p2": -1003246924678,
+    "y1p3": -1003246924678,
+    "y1p4": -1003246924678,
+
+    # Cp/Rp
+    "y2p1": -1003238391861,
+    "y2p2": -1003238391861,
+    "y2p3": -1003238391861,
+    "y2p4": -1003238391861,
+
+    # Mega Collection
+    "y3p1": -1003130577319,
+    "y3p2": -1003130577319,
+    "y3p3": -1003130577319,
+    "y3p4": -1003130577319,
+}
+
 @Client.on_message(filters.command("start") & filters.private)
 async def start(client, message):
     try:
@@ -67,6 +106,90 @@ async def start(client, message):
             f"⚠️ Start Handler Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
         print(f"⚠️ Start Handler Error: {e}")
+        print(traceback.format_exc())
+
+@Client.on_message(filters.command("resendlinks") & filters.private & filters.user(ADMINS))
+async def resend_links_command(client, message):
+    try:
+        parts = message.text.split()
+        if len(parts) < 3:
+            return await message.reply_text(
+                "⚙️ Usage:\n`/resendlinks <plan_prefix> <new_channel_id>`\n\nExample:\n`/resendlinks y1 -1002123456789`",
+                parse_mode=enums.ParseMode.MARKDOWN
+            )
+
+        plan_prefix = parts[1].strip()  # e.g. y1
+        new_channel_id = int(parts[2].strip())
+
+        await message.reply_text(
+            f"🔁 Starting resend process for **{plan_prefix}** plans...\n"
+            f"📢 Updating to new channel ID: `{new_channel_id}`",
+            parse_mode=enums.ParseMode.MARKDOWN
+        )
+
+        # ✅ Update all subplans in DB (so new users get correct channel)
+        for sub_plan in ["p1", "p2", "p3", "p4"]:
+            plan_key = f"{plan_prefix}{sub_plan}"
+            await db.update_plan_channel(plan_key, new_channel_id)
+
+        # ✅ Get all active, unexpired users for this plan category
+        active_users = await db.get_active_users_by_category(plan_prefix)
+        now = datetime.utcnow()
+        sent, skipped, failed = 0, 0, 0
+
+        for user in active_users:
+            try:
+                expiry = datetime.fromisoformat(user["expiry"])
+                if expiry <= now:
+                    skipped += 1
+                    continue  # skip expired users
+
+                user_id = user["id"]
+
+                # 🎟️ Generate a new invite link (valid for 1 hour)
+                invite = await client.create_chat_invite_link(
+                    chat_id=new_channel_id,
+                    name=f"Backup link for {user_id}",
+                    expire_date=now + timedelta(hours=1),
+                    member_limit=1
+                )
+
+                remaining = (expiry - now).days
+
+                # 💬 Notify user
+                await client.send_message(
+                    user_id,
+                    f"📢 <b>Channel Updated!</b>\n\n"
+                    f"Your premium access has been moved to a new channel.\n"
+                    f"🔗 <b>Join here:</b> {invite.invite_link}\n\n"
+                    f"⏳ Your access remains valid for <b>{remaining}</b> more days.\n"
+                    f"⚠️ Link expires in 1 hour, please join immediately.",
+                    parse_mode=enums.ParseMode.HTML
+                )
+                sent += 1
+                await asyncio.sleep(1)
+
+            except Exception as e:
+                print(f"❌ Failed for {user.get('id')}: {e}")
+                failed += 1
+
+        await message.reply_text(
+            f"✅ <b>Resend Completed!</b>\n\n"
+            f"📦 Plan Category: <code>{plan_prefix}</code>\n"
+            f"📨 Sent: <b>{sent}</b>\n"
+            f"⏸ Skipped Expired: <b>{skipped}</b>\n"
+            f"⚠️ Failed: <b>{failed}</b>\n"
+            f"💾 Future users will now get the new channel automatically.",
+            parse_mode=enums.ParseMode.HTML
+        )
+
+    except Exception as e:
+        await safe_action(
+            client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ Resend Link Handler Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ Resend Link Handler Error: {e}")
         print(traceback.format_exc())
 
 @Client.on_message(filters.command("broadcast") & filters.private & filters.user(ADMINS))
@@ -205,38 +328,55 @@ async def stats(client, message):
         print(f"⚠️ Stats Error: {e}")
         print(traceback.format_exc())
 
-PLAN_CATEGORY_MAP = {
-    "y1": "Mixed Collection",
-    "y2": "CP/RP Collection",
-    "y3": "Mega Collection"
-}
+@Client.on_message(filters.command("premiumstats") & filters.private & filters.user(ADMINS))
+async def premium_stats(client, message):
+    try:
+        now = datetime.utcnow()
 
-PLAN_DURATION_MAP = {
-    "p1": "1 Month",
-    "p2": "3 Months",
-    "p3": "6 Months",
-    "p4": "Lifetime"
-}
+        # Fetch all users from DB
+        cursor = db.col.find({})
+        active_counts = {k: 0 for k in PLAN_CATEGORY_MAP.keys()}
+        expired_counts = {k: 0 for k in PLAN_CATEGORY_MAP.keys()}
+        total_active = 0
+        total_expired = 0
 
-PLAN_CHANNEL_MAP = {
-    # Desi/Onlyfans
-    "y1p1": -1003246924678,
-    "y1p2": -1003246924678,
-    "y1p3": -1003246924678,
-    "y1p4": -1003246924678,
+        async for user in cursor:
+            plan_key = user.get("plan_key")
+            expiry_str = user.get("expiry")
+            active = user.get("active", False)
 
-    # Cp/Rp
-    "y2p1": -1003238391861,
-    "y2p2": -1003238391861,
-    "y2p3": -1003238391861,
-    "y2p4": -1003238391861,
+            if not plan_key:
+                continue
 
-    # Mega Collection
-    "y3p1": -1003130577319,
-    "y3p2": -1003130577319,
-    "y3p3": -1003130577319,
-    "y3p4": -1003130577319,
-}
+            category = plan_key[:2]
+            expiry = datetime.fromisoformat(expiry_str) if expiry_str else None
+
+            if expiry and expiry > now and active:
+                active_counts[category] += 1
+                total_active += 1
+            else:
+                expired_counts[category] += 1
+                total_expired += 1
+
+        # 🧾 Format output
+        text = "📊 <b>Premium Stats</b>\n\n"
+        text += f"👥 <b>Total Active:</b> {total_active}\n"
+        text += f"💤 <b>Total Expired:</b> {total_expired}\n\n"
+
+        for key, name in PLAN_CATEGORY_MAP.items():
+            act = active_counts[key]
+            exp = expired_counts[key]
+            text += f"• <b>{name}</b> → {act} active / {exp} expired\n"
+
+        await message.reply_text(text, parse_mode=enums.ParseMode.HTML)
+
+    except Exception as e:
+        await safe_action(client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ Premium Stats Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ Premium Stats Error: {e}")
+        print(traceback.format_exc())
 
 @Client.on_callback_query()
 async def callback(client, query):
@@ -746,13 +886,15 @@ async def message_capture(client: Client, message: Message):
                 plan_name = f"{plan_category} – {plan_duration}"
 
                 if new_text == expected_txn:
-                    channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                    channel_id = await db.get_plan_channel(plan_key)
                     if not channel_id:
-                        await safe_action(
-                            callback_message.edit_text,
-                            "⚠️ No channel assigned for this plan. Contact admin."
-                        )
-                        return
+                        channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                        if not channel_id:
+                            await safe_action(
+                                callback_message.edit_text,
+                                "⚠️ No channel assigned for this plan. Contact admin."
+                            )
+                            return
 
                     user = message.from_user
 
