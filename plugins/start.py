@@ -518,44 +518,122 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-            transactions = await fetch_fampay_payments()
-            if not transactions:
+            transactions = await verify_auto_payment(amount_expected)
+
+            if transactions:
                 await safe_action(
                     query.message.edit_text,
-                    "⚠️ No new payments found.\n\nMake sure you paid and try again in a minute.",
-                    parse_mode=enums.ParseMode.MARKDOWN
+                    f"✅ Payment Verified Successfully!\n\n"
+                    f"💰 Amount: ₹{amount_expected}\n"
+                    f"🆔 Txn ID: <code>{txn_id}</code>\n\n"
+                    f"Processing your premium access..."
                 )
-                return
 
-            now = datetime.utcnow()
+                # 🔍 Decode Plan Name Nicely
+                category_code = plan_key[:2]      # e.g. y1
+                duration_code = plan_key[-2:]     # e.g. p1
 
-            matched_payment = None
-            for txn in transactions:
-                if int(txn["amount"]) == amount_expected:
-                    matched_payment = txn
-                    break
+                plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
+                plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
+                plan_name = f"{plan_category} – {plan_duration}"
 
-            if matched_payment:
-                PENDING_TXN[query.from_user.id] = {
-                    "duration": duration,
-                    "amount_expected": amount_expected,
-                    "txn_expected": matched_payment["txn_id"],
-                    "callback_message": query.message,
-                    "plan_key": plan_key
-                }
+                channel_id = await db.get_plan_channel(plan_key)
+                if not channel_id:
+                    channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                    if not channel_id:
+                        await safe_action(
+                            query.message.edit_text,
+                            "⚠️ No channel assigned for this plan. Contact admin."
+                        )
+                        return
 
+                user = message.from_user
+
+                # ✅ Create invite link
+                invite = await client.create_chat_invite_link(
+                    chat_id=channel_id,
+                    name=f"Access for {user.first_name}",
+                    expire_date=datetime.utcnow() + timedelta(hours=1),
+                    member_limit=1
+                )
+
+                # 🧾 Notify admin
+                for admin_id in ADMINS:
+                    await safe_action(
+                        client.send_message,
+                        admin_id,
+                        f"📢 <b>New Payment Verified</b>\n\n"
+                        f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
+                        f"💬 <b>Username:</b> @{user.username or 'None'}\n"
+                        f"💰 <b>Amount:</b> ₹{amount_expected}\n"
+                        f"🕒 <b>Duration:</b> {duration}\n"
+                        f"🎫 <b>Plan:</b> {plan_name}\n"
+                        f"🔗 <b>Invite Link:</b> {invite.invite_link}",
+                        parse_mode=enums.ParseMode.HTML
+                    )
+
+                # 💬 Send link to user
                 await safe_action(
                     query.message.edit_text,
-                    f"✅ Payment detected for ₹{amount_expected}!\n\n"
-                    "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
-                    parse_mode=enums.ParseMode.MARKDOWN
+                    f"✅ Payment verified!\n\n"
+                    f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
+                    f"💬 Username: @{user.username or 'None'}\n"
+                    f"💰 Amount: ₹{amount_expected}\n"
+                    f"🕒 Duration: {duration}\n"
+                    f"🎫 Plan: {plan_name}\n"
+                    f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
+                    f"⚠️ This link will expire automatically after you join.",
+                    parse_mode=enums.ParseMode.HTML
                 )
+
+                # 🔒 Revoke invite after short delay
+                async def revoke_after_join():
+                    await asyncio.sleep(60)
+                    try:
+                        await client.revoke_chat_invite_link(channel_id, invite.invite_link)
+                    except Exception:
+                        pass
+
+                asyncio.create_task(revoke_after_join())
+
+                # ---------------- EXPIRE TIME SETUP ----------------
+                expiry_date = None
+                if "1" in duration:
+                    expiry_date = datetime.utcnow() + timedelta(days=30)
+                elif "3" in duration:
+                    expiry_date = datetime.utcnow() + timedelta(days=90)
+                elif "6" in duration:
+                    expiry_date = datetime.utcnow() + timedelta(days=180)
+                elif "Life" in duration or "life" in duration:
+                    expiry_date = None
+
+                # 💾 Save to DB (only if timed plan)
+                if expiry_date:
+                    await db.update_subscription(user.id, plan_key, channel_id, expiry_date)
+
+                    # 💤 Auto kick user after expiry
+                    async def auto_kick_user():
+                        await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
+                        try:
+                            await client.ban_chat_member(channel_id, user.id)
+                            await client.unban_chat_member(channel_id, user.id)
+                            await db.deactivate_subscription(user.id)
+                            await client.send_message(
+                                user.id,
+                                f"⏰ Your {duration} premium access has expired.\n"
+                                "You’ve been removed from the premium channel.\n\n"
+                                "To renew, please purchase again.",
+                                parse_mode=enums.ParseMode.HTML
+                            )
+                        except Exception as e:
+                            print(f"Failed to kick {user.id}: {e}")
+
+                    asyncio.create_task(auto_kick_user())
             else:
                 await safe_action(
                     query.message.edit_text,
-                    f"❌ No new payment found for ₹{amount_expected}.\n\n"
-                    "Make sure your transaction is completed and try again after 1 minute.",
-                    parse_mode=enums.ParseMode.MARKDOWN
+                    "❌ No matching payment found.\n\n"
+                    "Please make sure you’ve completed payment and try again in a minute."
                 )
             await safe_action(query.answer)
 
