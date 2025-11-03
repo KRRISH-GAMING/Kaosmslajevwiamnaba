@@ -454,7 +454,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹1", "1️⃣ Month"),
+                "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -495,7 +495,7 @@ async def callback(client, query):
         elif data.startswith("paid1_"):
             plan_key = data.replace("paid1_", "")
             plan_map = {
-                "y1p1": ("₹1", "1️⃣ Month"),
+                "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -579,7 +579,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y2p"):
             price_map = {
-                "y2p1": ("₹2", "1️⃣ Month"),
+                "y2p1": ("₹200", "1️⃣ Month"),
                 "y2p2": ("₹400", "3️⃣ Month"),
                 "y2p3": ("₹600", "6️⃣ Month"),
                 "y2p4": ("₹1000", "Lifetime")
@@ -620,7 +620,7 @@ async def callback(client, query):
         elif data.startswith("paid2_"):
             plan_key = data.replace("paid2_", "")
             plan_map = {
-                "y2p1": ("₹2", "1️⃣ Month"),
+                "y2p1": ("₹200", "1️⃣ Month"),
                 "y2p2": ("₹400", "3️⃣ Month"),
                 "y2p3": ("₹600", "6️⃣ Month"),
                 "y2p4": ("₹1000", "Lifetime")
@@ -704,7 +704,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y3p"):
             price_map = {
-                "y3p1": ("₹2", "1️⃣ Month"),
+                "y3p1": ("₹200", "1️⃣ Month"),
                 "y3p2": ("₹400", "3️⃣ Month"),
                 "y3p3": ("₹600", "6️⃣ Month"),
                 "y3p4": ("₹1000", "Lifetime")
@@ -745,7 +745,7 @@ async def callback(client, query):
         elif data.startswith("paid3_"):
             plan_key = data.replace("paid3_", "")
             plan_map = {
-                "y3p1": ("₹2", "1️⃣ Month"),
+                "y3p1": ("₹200", "1️⃣ Month"),
                 "y3p2": ("₹400", "3️⃣ Month"),
                 "y3p3": ("₹600", "6️⃣ Month"),
                 "y3p4": ("₹1000", "Lifetime")
