@@ -579,7 +579,7 @@ async def callback(client, query):
                         f"🎫 <b>Plan:</b> {plan_name}\n"
                         f"🕒 <b>Duration:</b> {duration}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
-                        f"🧾 <b>Txn ID:</b> <code>{expected_txn}</code>\n"
+                        f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
                         f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                         parse_mode=enums.ParseMode.HTML
                     )
@@ -592,7 +592,7 @@ async def callback(client, query):
                     f"🎫 Plan: {plan_name}\n"
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
-                    f"🧾 Txn ID: <code>{expected_txn}</code>\n"
+                    f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"
                     f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                     f"⚠️ This link will expire automatically after you join.",
                     parse_mode=enums.ParseMode.HTML
