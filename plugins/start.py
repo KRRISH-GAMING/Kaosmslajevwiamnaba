@@ -11,6 +11,7 @@ from plugins.helper import *
 PAYMENT_CACHE = {}
 LAST_PAYMENT_CHECK = 0
 
+USER_LINKS = {}
 PAYMENT_CACHE = {}
 PENDING_TXN = {}
 
@@ -565,9 +566,13 @@ async def callback(client, query):
                 invite = await client.create_chat_invite_link(
                     chat_id=channel_id,
                     name=f"Access for {user.first_name}",
-                    expire_date=datetime.utcnow() + timedelta(hours=1),
                     member_limit=1
                 )
+
+                USER_LINKS[user.id] = {
+                    "chat_id": channel_id,
+                    "invite_link": invite.invite_link
+                }
 
                 for admin_id in ADMINS:
                     await safe_action(
@@ -597,15 +602,6 @@ async def callback(client, query):
                     f"⚠️ This link will expire automatically after you join.",
                     parse_mode=enums.ParseMode.HTML
                 )
-
-                async def revoke_after_join():
-                    await asyncio.sleep(60)
-                    try:
-                        await client.revoke_chat_invite_link(channel_id, invite.invite_link)
-                    except Exception:
-                        pass
-
-                asyncio.create_task(revoke_after_join())
 
                 expiry_date = None
                 if "1" in duration:
@@ -1125,4 +1121,32 @@ async def message_capture(client: Client, message: Message):
             f"⚠️ message_capture Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
         print(f"⚠️ message_capture Error: {e}")
+        print(traceback.format_exc())
+
+@Client.on_chat_member_updated()
+async def handle_member_join(client, event):
+    try:
+        if event.new_chat_member and event.new_chat_member.status == "member":
+            user_id = event.new_chat_member.user.id
+
+            if user_id in USER_LINKS:
+                info = USER_LINKS[user_id]
+                chat_id = info["chat_id"]
+                link = info["invite_link"]
+
+                try:
+                    await client.revoke_chat_invite_link(chat_id, link)
+                    print(f"✅ Revoked invite for user {user_id} in chat {chat_id}")
+                except Exception as e:
+                    print(f"⚠️ Failed to revoke invite for {user_id}: {e}")
+
+                del USER_LINKS[user_id]
+
+    except Exception as e:
+        await safe_action(
+            client.send_message,
+            LOG_CHANNEL,
+            f"⚠️ handle_member_join Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
+        )
+        print(f"⚠️ handle_member_join Error: {e}")
         print(traceback.format_exc())
