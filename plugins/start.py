@@ -9,6 +9,9 @@ from plugins.database import *
 from plugins.helper import *
 
 PAYMENT_CACHE = {}
+LAST_PAYMENT_CHECK = 0
+
+PAYMENT_CACHE = {}
 PENDING_TXN = {}
 
 LOG_TEXT = """<b><u>#NewUser</u></b>
@@ -454,7 +457,7 @@ async def callback(client, query):
         # Payment menu when a price is selected
         elif data.startswith("y1p"):
             price_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -467,7 +470,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("🔙 Back", callback_data="y1")]
             ]
 
-            upi_id = "krrishmehta@airtel"
+            upi_id = "krishxmehta@fam"
             upi_name = "KM Membership Bot"
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
@@ -495,7 +498,7 @@ async def callback(client, query):
         elif data.startswith("paid1_"):
             plan_key = data.replace("paid1_", "")
             plan_map = {
-                "y1p1": ("₹100", "1️⃣ Month"),
+                "y1p1": ("₹1", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
                 "y1p4": ("₹500", "Lifetime")
@@ -518,36 +521,126 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-            now = datetime.utcnow()
+            global LAST_PAYMENT_CHECK, PAYMENT_CACHE
 
-            matched_payment = None
-            for txn in PAYMENT_CACHE.values():
-                if (txn["amount"] == amount_expected and (now - txn["time"]).seconds < 300 and not txn.get("used_for")):
-                    matched_payment = txn
+            now = datetime.now(pytz.UTC)
+
+            if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
+                new_txns = await fetch_fampay_payments()
+                for txn in new_txns:
+                    if txn.get("time") and txn["time"].tzinfo is None:
+                        txn["time"] = pytz.UTC.localize(txn["time"])
+                    PAYMENT_CACHE[txn["txn_id"]] = txn
+                LAST_PAYMENT_CHECK = now.timestamp()
+
+            matched_txn = None
+            for txn in sorted(PAYMENT_CACHE.values(), key=lambda x: x["time"], reverse=True):
+                txn_time = txn["time"].astimezone(pytz.UTC)
+                txn_age = now - txn_time
+                if txn["amount"] == amount_expected and txn_age < timedelta(minutes=10):
+                    matched_txn = txn
                     break
 
-            if matched_payment:
-                matched_payment["used_for"] = plan_key
+            if matched_txn:
+                category_code = plan_key[:2]
+                duration_code = plan_key[-2:]
 
-                PENDING_TXN[query.from_user.id] = {
-                    "duration": duration,
-                    "amount_expected": amount_expected,
-                    "txn_expected": matched_payment["txn_id"],
-                    "callback_message": query.message,
-                    "plan_key": plan_key
-                }
+                plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
+                plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
+                plan_name = f"{plan_category} – {plan_duration}"
+
+                channel_id = await db.get_plan_channel(plan_key)
+                if not channel_id:
+                    channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                    if not channel_id:
+                        await safe_action(
+                            query.message.edit_text,
+                            "⚠️ No channel assigned for this plan. Contact admin."
+                        )
+                        return
+
+                user = message.from_user
+
+                invite = await client.create_chat_invite_link(
+                    chat_id=channel_id,
+                    name=f"Access for {user.first_name}",
+                    expire_date=datetime.utcnow() + timedelta(hours=1),
+                    member_limit=1
+                )
+
+                for admin_id in ADMINS:
+                    await safe_action(
+                        client.send_message,
+                        admin_id,
+                        f"📢 <b>New Payment Verified</b>\n\n"
+                        f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
+                        f"💬 <b>Username:</b> @{user.username or 'None'}\n"
+                        f"🎫 <b>Plan:</b> {plan_name}\n"
+                        f"🕒 <b>Duration:</b> {duration}\n"
+                        f"💰 <b>Amount:</b> ₹{amount_expected}\n"
+                        f"🧾 <b>Txn ID:</b> <code>{expected_txn}</code>\n"
+                        f"🔗 <b>Invite Link:</b> {invite.invite_link}",
+                        parse_mode=enums.ParseMode.HTML
+                    )
 
                 await safe_action(
                     query.message.edit_text,
-                    f"✅ Payment detected for ₹{amount_expected}!\n\n"
-                    "Please reply with your **Transaction ID (Txn ID)** to confirm your payment.",
-                    parse_mode=enums.ParseMode.MARKDOWN
+                    f"✅ Payment verified!\n\n"
+                    f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
+                    f"💬 Username: @{user.username or 'None'}\n"
+                    f"🎫 Plan: {plan_name}\n"
+                    f"🕒 Duration: {duration}\n"
+                    f"💰 Amount: ₹{amount_expected}\n"
+                    f"🧾 Txn ID: <code>{expected_txn}</code>\n"
+                    f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
+                    f"⚠️ This link will expire automatically after you join.",
+                    parse_mode=enums.ParseMode.HTML
                 )
+
+                async def revoke_after_join():
+                    await asyncio.sleep(60)
+                    try:
+                        await client.revoke_chat_invite_link(channel_id, invite.invite_link)
+                    except Exception:
+                        pass
+
+                asyncio.create_task(revoke_after_join())
+
+                expiry_date = None
+                if "1" in duration:
+                    expiry_date = datetime.utcnow() + timedelta(days=30)
+                elif "3" in duration:
+                    expiry_date = datetime.utcnow() + timedelta(days=90)
+                elif "6" in duration:
+                    expiry_date = datetime.utcnow() + timedelta(days=180)
+                elif "Life" in duration or "life" in duration:
+                    expiry_date = None
+
+                if expiry_date:
+                    await db.update_subscription(user.id, plan_key, channel_id, expiry_date)
+
+                    async def auto_kick_user():
+                        await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
+                        try:
+                            await client.ban_chat_member(channel_id, user.id)
+                            await client.unban_chat_member(channel_id, user.id)
+                            await db.deactivate_subscription(user.id)
+                            await client.send_message(
+                                user.id,
+                                f"⏰ Your {duration} premium access has expired.\n"
+                                "You’ve been removed from the premium channel.\n\n"
+                                "To renew, please purchase again.",
+                                parse_mode=enums.ParseMode.HTML
+                            )
+                        except Exception as e:
+                            print(f"Failed to kick {user.id}: {e}")
+
+                    asyncio.create_task(auto_kick_user())
             else:
                 await safe_action(
                     query.message.edit_text,
-                    f"❌ No new payment found for ₹{amount_expected}.\n\n"
-                    "Make sure your transaction is completed and try again after 1 minute.",
+                    f"❌ No recent payment found for ₹{amount_expected}.\n\n"
+                    f"Please wait 1 minute and click **Payment Done** again.",
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
             await safe_action(query.answer)
@@ -592,7 +685,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("🔙 Back", callback_data="y2")]
             ]
 
-            upi_id = "krrishmehta@airtel"
+            upi_id = "krishxmehta@fam"
             upi_name = "KM Membership Bot"
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 
@@ -717,7 +810,7 @@ async def callback(client, query):
                 [InlineKeyboardButton("🔙 Back", callback_data="y3")]
             ]
 
-            upi_id = "krrishmehta@airtel"
+            upi_id = "krishxmehta@fam"
             upi_name = "KM Membership Bot"
             qr_image = generate_upi_qr(upi_id, upi_name, price)
 

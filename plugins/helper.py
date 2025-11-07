@@ -94,38 +94,32 @@ async def fetch_fampay_payments():
 
         mail = imaplib.IMAP4_SSL(IMAP_HOST)
         mail.login(IMAP_USER, IMAP_PASS)
-
         mail.select("inbox")
 
         status, email_ids = mail.search(None, '(UNSEEN FROM "no-reply@famapp.in")')
 
         if status != "OK" or not email_ids or not email_ids[0]:
+            mail.logout()
             return []
 
-        email_list = email_ids[0].split()
-
-        latest_5_emails = email_list[-5:]
+        email_list = email_ids[0].split()[-10:]
 
         transactions = []
         kolkata_tz = pytz.timezone("Asia/Kolkata")
 
-        for email_id in latest_5_emails:
+        for email_id in email_list:
             status, msg_data = mail.fetch(email_id, "(RFC822)")
-
             if status != "OK" or not msg_data:
                 continue
 
-            raw_email = msg_data[0][1]
-            msg = email.message_from_bytes(raw_email)
-
-            email_date = msg["Date"]
+            msg = email.message_from_bytes(msg_data[0][1])
+            raw_date = msg["Date"]
 
             try:
-                email_datetime = datetime.strptime(email_date, "%a, %d %b %Y %H:%M:%S %z")
-            except ValueError as ve:
-                continue
-
-            email_datetime = email_datetime.astimezone(kolkata_tz)
+                email_time = datetime.strptime(raw_date, "%a, %d %b %Y %H:%M:%S %z")
+                email_time = email_time.astimezone(pytz.UTC)
+            except Exception:
+                email_time = datetime.now(pytz.UTC)
 
             body = ""
             if msg.is_multipart():
@@ -140,24 +134,26 @@ async def fetch_fampay_payments():
                 continue
 
             amount_match = re.search(r"₹\s?([\d,.]+)", body)
-            if amount_match:
-                amount = float(amount_match.group(1).replace(",", ""))
-            else:
-                amount = None
+            amount = float(amount_match.group(1).replace(",", "")) if amount_match else None
 
-            txn_match = re.search(r"transaction id\s*[:\-]?\s*(\w+)", body, re.I)
-            txn_id = txn_match.group(1) if txn_match else None
+            payer_match = re.search(r"from\s+([A-Z\s]+)", body, re.I)
+            payer_name = payer_match.group(1).strip() if payer_match else "Unknown"
+
+            txn_match = re.search(r"Transaction ID\s*[:\-]?\s*([A-Z0-9]+)", body, re.I)
+            txn_id = txn_match.group(1).strip() if txn_match else None
 
             if not amount or not txn_id:
                 continue
 
             txn = {
-                "date": email_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+                "date": email_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "txn_id": txn_id,
                 "amount": amount,
-                "txn_id": txn_id
+                "payer": payer_name,
+                "time": email_time,
             }
-            transactions.append(txn)
 
+            transactions.append(txn)
             mail.store(email_id, '+FLAGS', '\\Seen')
 
         mail.logout()
