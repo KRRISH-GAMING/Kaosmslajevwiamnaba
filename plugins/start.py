@@ -510,11 +510,19 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
+            category_code = plan_key[:2]
+            duration_code = plan_key[-2:]
+
+            plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
+            plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
+            plan_name = f"{plan_category} – {plan_duration}"
+
             await safe_action(
                 query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"Feature: {duration}\n"
+                    f"🎫 Plan: {plan_name}\n"
+                    f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
                 ),
@@ -542,13 +550,6 @@ async def callback(client, query):
                     break
 
             if matched_txn:
-                category_code = plan_key[:2]
-                duration_code = plan_key[-2:]
-
-                plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
-                plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
-                plan_name = f"{plan_category} – {plan_duration}"
-
                 channel_id = await db.get_plan_channel(plan_key)
                 if not channel_id:
                     channel_id = PLAN_CHANNEL_MAP.get(plan_key)
@@ -559,7 +560,7 @@ async def callback(client, query):
                         )
                         return
 
-                user = message.from_user
+                user = query.from_user
 
                 invite = await client.create_chat_invite_link(
                     chat_id=channel_id,
