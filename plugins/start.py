@@ -131,12 +131,10 @@ async def resend_links_command(client, message):
             parse_mode=enums.ParseMode.MARKDOWN
         )
 
-        # ✅ Update all subplans in DB (so new users get correct channel)
         for sub_plan in ["p1", "p2", "p3", "p4"]:
             plan_key = f"{plan_prefix}{sub_plan}"
             await db.update_plan_channel(plan_key, new_channel_id)
 
-        # ✅ Get all active, unexpired users for this plan category
         active_users = await db.get_active_users_by_category(plan_prefix)
         now = datetime.utcnow()
         sent, skipped, failed = 0, 0, 0
@@ -146,11 +144,10 @@ async def resend_links_command(client, message):
                 expiry = datetime.fromisoformat(user["expiry"])
                 if expiry <= now:
                     skipped += 1
-                    continue  # skip expired users
+                    continue
 
                 user_id = user["id"]
 
-                # 🎟️ Generate a new invite link (valid for 1 hour)
                 invite = await client.create_chat_invite_link(
                     chat_id=new_channel_id,
                     name=f"Backup link for {user_id}",
@@ -160,7 +157,6 @@ async def resend_links_command(client, message):
 
                 remaining = (expiry - now).days
 
-                # 💬 Notify user
                 await client.send_message(
                     user_id,
                     f"📢 <b>Channel Updated!</b>\n\n"
@@ -337,7 +333,6 @@ async def premium_stats(client, message):
     try:
         now = datetime.utcnow()
 
-        # Fetch all users from DB
         cursor = db.col.find({})
         active_counts = {k: 0 for k in PLAN_CATEGORY_MAP.keys()}
         expired_counts = {k: 0 for k in PLAN_CATEGORY_MAP.keys()}
@@ -362,7 +357,6 @@ async def premium_stats(client, message):
                 expired_counts[category] += 1
                 total_expired += 1
 
-        # 🧾 Format output
         text = "📊 <b>Premium Stats</b>\n\n"
         text += f"👥 <b>Total Active:</b> {total_active}\n"
         text += f"💤 <b>Total Expired:</b> {total_expired}\n\n"
@@ -512,7 +506,7 @@ async def callback(client, query):
             amount_expected = int(price.replace("₹", ""))
 
             category_code = plan_key[:2]
-            duration_code = plan_key[-2:]
+            duration_code = plan_key[2:]
 
             plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
             plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
@@ -1126,22 +1120,20 @@ async def message_capture(client: Client, message: Message):
 @Client.on_chat_member_updated()
 async def handle_member_join(client, event):
     try:
-        if event.new_chat_member and event.new_chat_member.status == "member":
+        if event.new_chat_member and event.new_chat_member.status == enums.ChatMemberStatus.MEMBER:
             user_id = event.new_chat_member.user.id
+            chat_id = event.chat.id
 
             if user_id in USER_LINKS:
                 info = USER_LINKS[user_id]
-                chat_id = info["chat_id"]
                 link = info["invite_link"]
 
                 try:
                     await client.revoke_chat_invite_link(chat_id, link)
-                    print(f"✅ Revoked invite for user {user_id} in chat {chat_id}")
                 except Exception as e:
-                    print(f"⚠️ Failed to revoke invite for {user_id}: {e}")
+                    pass
 
                 del USER_LINKS[user_id]
-
     except Exception as e:
         await safe_action(
             client.send_message,
