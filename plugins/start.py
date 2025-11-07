@@ -384,6 +384,8 @@ async def callback(client, query):
         user_id = query.from_user.id
         data = query.data
 
+        global LAST_PAYMENT_CHECK, PAYMENT_CACHE
+
         # Start
         if data == "x0":
             buttons = [
@@ -521,8 +523,6 @@ async def callback(client, query):
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
-
-            global LAST_PAYMENT_CHECK, PAYMENT_CACHE
 
             now = datetime.now(pytz.UTC)
 
@@ -733,8 +733,6 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-            global LAST_PAYMENT_CHECK, PAYMENT_CACHE
-
             now = datetime.now(pytz.UTC)
 
             if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
@@ -943,8 +941,6 @@ async def callback(client, query):
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN
             )
-
-            global LAST_PAYMENT_CHECK, PAYMENT_CACHE
 
             now = datetime.now(pytz.UTC)
 
