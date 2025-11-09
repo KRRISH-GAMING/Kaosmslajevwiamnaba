@@ -152,7 +152,7 @@ async def resend_links_command(client, message):
                     member_limit=1
                 )
 
-                USER_LINKS[user.id] = {
+                USER_LINKS[user_id] = {
                     "chat_id": new_channel_id,
                     "invite_link": invite.invite_link
                 }
