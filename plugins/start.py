@@ -581,6 +581,7 @@ async def callback(client, query):
                         f"🕒 <b>Duration:</b> {duration}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                         f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
+                        f"⏰ <b>Time:</b> {matched_txn['time']}"
                         f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                         parse_mode=enums.ParseMode.HTML
                     )
@@ -594,6 +595,7 @@ async def callback(client, query):
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"
+                    f"⏰ Time: {matched_txn['time']}"
                     f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                     f"⚠️ This link will expire automatically after you join.",
                     parse_mode=enums.ParseMode.HTML
@@ -790,6 +792,7 @@ async def callback(client, query):
                         f"🕒 <b>Duration:</b> {duration}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                         f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
+                        f"⏰ <b>Time:</b> {matched_txn['time']}"
                         f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                         parse_mode=enums.ParseMode.HTML
                     )
@@ -803,6 +806,7 @@ async def callback(client, query):
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"
+                    f"⏰ Time: {matched_txn['time']}"
                     f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                     f"⚠️ This link will expire automatically after you join.",
                     parse_mode=enums.ParseMode.HTML
@@ -999,6 +1003,7 @@ async def callback(client, query):
                         f"🕒 <b>Duration:</b> {duration}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                         f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
+                        f"⏰ <b>Time:</b> {matched_txn['time']}"
                         f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                         parse_mode=enums.ParseMode.HTML
                     )
@@ -1012,6 +1017,7 @@ async def callback(client, query):
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"
+                    f"⏰ Time: {matched_txn['time']}"
                     f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
                     f"⚠️ This link will expire automatically after you join.",
                     parse_mode=enums.ParseMode.HTML
