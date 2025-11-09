@@ -39,29 +39,29 @@ PLAN_DURATION_MAP = {
 }
 
 ACTIVE_CHANNELS = {
-    "y1": -1003246924678,  # Mixed Collection
-    "y2": -1003238391861,  # CP/RP
-    "y3": -1003130577319   # Mega
+    "y1": -1002745649036,  # Mixed Collection
+    "y2": -1003264225931,  # CP/RP
+    "y3": -1003212677737   # Mega
 }
 
 PLAN_CHANNEL_MAP = {
     # Desi/Onlyfans
-    "y1p1": -1003246924678,
-    "y1p2": -1003246924678,
-    "y1p3": -1003246924678,
-    "y1p4": -1003246924678,
+    "y1p1": -1002745649036,
+    "y1p2": -1002745649036,
+    "y1p3": -1002745649036,
+    "y1p4": -1002745649036,
 
     # Cp/Rp
-    "y2p1": -1003238391861,
-    "y2p2": -1003238391861,
-    "y2p3": -1003238391861,
-    "y2p4": -1003238391861,
+    "y2p1": -1003264225931,
+    "y2p2": -1003264225931,
+    "y2p3": -1003264225931,
+    "y2p4": -1003264225931,
 
     # Mega Collection
-    "y3p1": -1003130577319,
-    "y3p2": -1003130577319,
-    "y3p3": -1003130577319,
-    "y3p4": -1003130577319,
+    "y3p1": -1003212677737,
+    "y3p2": -1003212677737,
+    "y3p3": -1003212677737,
+    "y3p4": -1003212677737,
 }
 
 @Client.on_message(filters.command("start") & filters.private)
@@ -149,9 +149,13 @@ async def resend_links_command(client, message):
                 invite = await client.create_chat_invite_link(
                     chat_id=new_channel_id,
                     name=f"Backup link for {user_id}",
-                    expire_date=now + timedelta(hours=1),
                     member_limit=1
                 )
+
+                USER_LINKS[user.id] = {
+                    "chat_id": new_channel_id,
+                    "invite_link": invite.invite_link
+                }
 
                 remaining = (expiry - now).days
 
