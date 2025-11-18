@@ -20,7 +20,9 @@ Id - <code>{}</code>
 
 Name - {}
 
-Username - {}"""
+Username - {}
+
+From - @XclusiveMembershipBot"""
 
 broadcast_cancel = False
 
@@ -511,7 +513,6 @@ async def callback(client, query):
 
             now = datetime.now(pytz.UTC)
 
-            global LAST_PAYMENT_CHECK
             if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
                 new_txns = await fetch_fampay_payments()
                 for txn in new_txns:
@@ -722,7 +723,6 @@ async def callback(client, query):
 
             now = datetime.now(pytz.UTC)
 
-            global LAST_PAYMENT_CHECK
             if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
                 new_txns = await fetch_fampay_payments()
                 for txn in new_txns:
@@ -933,7 +933,6 @@ async def callback(client, query):
 
             now = datetime.now(pytz.UTC)
 
-            global LAST_PAYMENT_CHECK
             if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
                 new_txns = await fetch_fampay_payments()
                 for txn in new_txns:
