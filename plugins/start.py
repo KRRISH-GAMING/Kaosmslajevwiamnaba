@@ -447,7 +447,7 @@ async def callback(client, query):
                 "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
-                "y1p4": ("₹500", "Lifetime")
+                "y1p4": ("₹1", "Lifetime")
             }
 
             price, duration = price_map[data]
@@ -511,7 +511,6 @@ async def callback(client, query):
 
             now = datetime.now(pytz.UTC)
 
-            # Fetch new TXNs every 30 seconds
             global LAST_PAYMENT_CHECK
             if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
                 new_txns = await fetch_fampay_payments()
@@ -521,28 +520,20 @@ async def callback(client, query):
                     PAYMENT_CACHE[txn["txn_id"]] = txn
                 LAST_PAYMENT_CHECK = now.timestamp()
 
-            # -----------------------
-            # FIND MATCHING TXN
-            # -----------------------
             matched_txn = None
             for txn in sorted(PAYMENT_CACHE.values(), key=lambda x: x["time"], reverse=True):
                 txn_id = txn["txn_id"]
 
-                # 🚫 Already used → skip
                 if txn_id in USED_TXNS:
                     continue
 
                 txn_time = txn["time"].astimezone(pytz.UTC)
                 txn_age = now - txn_time
 
-                # Match valid same-amount, recent transaction
                 if txn["amount"] == amount_expected and txn_age < timedelta(minutes=10):
                     matched_txn = txn
                     break
 
-            # -----------------------
-            # NO PAYMENT FOUND
-            # -----------------------
             if not matched_txn:
                 return await safe_action(
                     query.message.edit_text,
@@ -551,12 +542,8 @@ async def callback(client, query):
                     parse_mode=enums.ParseMode.MARKDOWN
                 )
 
-            # -----------------------
-            # PAYMENT VERIFIED
-            # -----------------------
             txn_id = matched_txn["txn_id"]
 
-            # 🔒 Mark as USED (forever)
             USED_TXNS.add(txn_id)
             await db.save_used_txn(txn_id)
 
@@ -582,7 +569,6 @@ async def callback(client, query):
                 "invite_link": invite.invite_link
             }
 
-            # Admin alerts
             for admin_id in ADMINS:
                 await safe_action(
                     client.send_message,
@@ -599,7 +585,6 @@ async def callback(client, query):
                     parse_mode=enums.ParseMode.HTML
                 )
 
-            # User message
             await safe_action(
                 query.message.edit_text,
                 f"✅ <b>Payment Verified!</b>\n\n"
@@ -614,7 +599,6 @@ async def callback(client, query):
                 parse_mode=enums.ParseMode.HTML
             )
 
-            # Handle expiry
             expiry_date = None
             if "1" in duration:
                 expiry_date = datetime.utcnow() + timedelta(days=30)
