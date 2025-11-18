@@ -488,7 +488,7 @@ async def callback(client, query):
                 "y1p1": ("₹100", "1️⃣ Month"),
                 "y1p2": ("₹200", "3️⃣ Month"),
                 "y1p3": ("₹300", "6️⃣ Month"),
-                "y1p4": ("₹500", "Lifetime")
+                "y1p4": ("₹1", "Lifetime")
             }
 
             if plan_key not in plan_map:
