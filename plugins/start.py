@@ -8,8 +8,9 @@ from plugins.config import *
 from plugins.database import *
 from plugins.helper import *
 
-PAYMENT_CACHE = {}
+USED_TXNS = set()
 LAST_PAYMENT_CHECK = 0
+PAYMENT_CACHE = {}
 
 USER_LINKS = {}
 
@@ -29,19 +30,6 @@ PLAN_CATEGORY_MAP = {
     "y1": "Mixed Collection",
     "y2": "CP/RP Collection",
     "y3": "Mega Collection"
-}
-
-PLAN_DURATION_MAP = {
-    "p1": "1 Month",
-    "p2": "3 Months",
-    "p3": "6 Months",
-    "p4": "Lifetime"
-}
-
-ACTIVE_CHANNELS = {
-    "y1": -1002745649036,  # Mixed Collection
-    "y2": -1003264225931,  # CP/RP
-    "y3": -1003212677737   # Mega
 }
 
 PLAN_CHANNEL_MAP = {
@@ -509,18 +497,11 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            category_code = plan_key[:2]
-            duration_code = plan_key[2:]
-
-            plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
-            plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
-            plan_name = f"{plan_category} – {plan_duration}"
-
             await safe_action(
                 query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"🎫 Plan: {plan_name}\n"
+                    f"🎫 Plan: 🎬 Mixed Collection\n"
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
@@ -530,6 +511,8 @@ async def callback(client, query):
 
             now = datetime.now(pytz.UTC)
 
+            # Fetch new TXNs every 30 seconds
+            global LAST_PAYMENT_CHECK
             if (now.timestamp() - LAST_PAYMENT_CHECK) > 30:
                 new_txns = await fetch_fampay_payments()
                 for txn in new_txns:
@@ -538,106 +521,127 @@ async def callback(client, query):
                     PAYMENT_CACHE[txn["txn_id"]] = txn
                 LAST_PAYMENT_CHECK = now.timestamp()
 
+            # -----------------------
+            # FIND MATCHING TXN
+            # -----------------------
             matched_txn = None
             for txn in sorted(PAYMENT_CACHE.values(), key=lambda x: x["time"], reverse=True):
+                txn_id = txn["txn_id"]
+
+                # 🚫 Already used → skip
+                if txn_id in USED_TXNS:
+                    continue
+
                 txn_time = txn["time"].astimezone(pytz.UTC)
                 txn_age = now - txn_time
+
+                # Match valid same-amount, recent transaction
                 if txn["amount"] == amount_expected and txn_age < timedelta(minutes=10):
                     matched_txn = txn
                     break
 
-            if matched_txn:
-                channel_id = await db.get_plan_channel(plan_key)
-                if not channel_id:
-                    channel_id = PLAN_CHANNEL_MAP.get(plan_key)
-                    if not channel_id:
-                        await safe_action(
-                            query.message.edit_text,
-                            "⚠️ No channel assigned for this plan. Contact admin."
-                        )
-                        return
-
-                user = query.from_user
-
-                invite = await client.create_chat_invite_link(
-                    chat_id=channel_id,
-                    name=f"Access for {user.first_name}",
-                    member_limit=1
+            # -----------------------
+            # NO PAYMENT FOUND
+            # -----------------------
+            if not matched_txn:
+                return await safe_action(
+                    query.message.edit_text,
+                    f"❌ No recent payment found for ₹{amount_expected}.\n\n"
+                    "Please wait 1 minute and press **Payment Done** again.",
+                    parse_mode=enums.ParseMode.MARKDOWN
                 )
 
-                USER_LINKS[user.id] = {
-                    "chat_id": channel_id,
-                    "invite_link": invite.invite_link
-                }
+            # -----------------------
+            # PAYMENT VERIFIED
+            # -----------------------
+            txn_id = matched_txn["txn_id"]
 
-                for admin_id in ADMINS:
-                    await safe_action(
-                        client.send_message,
-                        admin_id,
-                        f"📢 <b>New Payment Verified</b>\n\n"
-                        f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
-                        f"💬 <b>Username:</b> @{user.username or 'None'}\n"
-                        f"🎫 <b>Plan:</b> {plan_name}\n"
-                        f"🕒 <b>Duration:</b> {duration}\n"
-                        f"💰 <b>Amount:</b> ₹{amount_expected}\n"
-                        f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
-                        f"⏰ <b>Time:</b> {matched_txn['time']}"
-                        f"🔗 <b>Invite Link:</b> {invite.invite_link}",
-                        parse_mode=enums.ParseMode.HTML
+            # 🔒 Mark as USED (forever)
+            USED_TXNS.add(txn_id)
+            await db.save_used_txn(txn_id)
+
+            channel_id = await db.get_plan_channel(plan_key)
+            if not channel_id:
+                channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                if not channel_id:
+                    return await safe_action(
+                        query.message.edit_text,
+                "⚠️ No channel assigned for this plan. Contact admin."
                     )
 
+            user = query.from_user
+
+            invite = await client.create_chat_invite_link(
+                chat_id=channel_id,
+                name=f"Access for {user.first_name}",
+                member_limit=1
+            )
+
+            USER_LINKS[user.id] = {
+                "chat_id": channel_id,
+                "invite_link": invite.invite_link
+            }
+
+            # Admin alerts
+            for admin_id in ADMINS:
                 await safe_action(
-                    query.message.edit_text,
-                    f"✅ Payment verified!\n\n"
-                    f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
-                    f"💬 Username: @{user.username or 'None'}\n"
-                    f"🎫 Plan: {plan_name}\n"
-                    f"🕒 Duration: {duration}\n"
-                    f"💰 Amount: ₹{amount_expected}\n"
-                    f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"
-                    f"⏰ Time: {matched_txn['time']}"
-                    f"🎟️ Your personal access link:\n{invite.invite_link}\n\n"
-                    f"⚠️ This link will expire automatically after you join.",
+                    client.send_message,
+                    admin_id,
+                    f"📢 <b>New Payment Verified</b>\n\n"
+                    f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
+                    f"💬 <b>Username:</b> @{user.username or 'None'}\n"
+                    f"🎫 <b>Plan:</b> 🎬 Mixed Collection\n"
+                    f"🕒 <b>Duration:</b> {duration}\n"
+                    f"💰 <b>Amount:</b> ₹{amount_expected}\n"
+                    f"🧾 <b>Txn ID:</b> <code>{txn_id}</code>\n"
+                    f"⏰ <b>Time:</b> {matched_txn['time']}\n"
+                    f"🔗 <b>Invite Link:</b> {invite.invite_link}",
                     parse_mode=enums.ParseMode.HTML
                 )
 
-                expiry_date = None
-                if "1" in duration:
-                    expiry_date = datetime.utcnow() + timedelta(days=30)
-                elif "3" in duration:
-                    expiry_date = datetime.utcnow() + timedelta(days=90)
-                elif "6" in duration:
-                    expiry_date = datetime.utcnow() + timedelta(days=180)
-                elif "Life" in duration or "life" in duration:
-                    expiry_date = None
+            # User message
+            await safe_action(
+                query.message.edit_text,
+                f"✅ <b>Payment Verified!</b>\n\n"
+                f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
+                f"🎫 Plan: 🎬 Mixed Collection\n"
+                f"🕒 Duration: {duration}\n"
+                f"💰 Amount: ₹{amount_expected}\n"
+                f"🧾 Txn ID: <code>{txn_id}</code>\n"
+                f"⏰ Time: {matched_txn['time']}\n\n"
+                f"🎟️ Your Access Link:\n{invite.invite_link}\n\n"
+                f"⚠️ Link expires after joining.",
+                parse_mode=enums.ParseMode.HTML
+            )
 
-                if expiry_date:
-                    await db.update_subscription(user.id, plan_key, channel_id, expiry_date)
+            # Handle expiry
+            expiry_date = None
+            if "1" in duration:
+                expiry_date = datetime.utcnow() + timedelta(days=30)
+            elif "3" in duration:
+                expiry_date = datetime.utcnow() + timedelta(days=90)
+            elif "6" in duration:
+                expiry_date = datetime.utcnow() + timedelta(days=180)
 
-                    async def auto_kick_user():
-                        await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
-                        try:
-                            await client.ban_chat_member(channel_id, user.id)
-                            await client.unban_chat_member(channel_id, user.id)
-                            await db.deactivate_subscription(user.id)
-                            await client.send_message(
-                                user.id,
-                                f"⏰ Your {duration} premium access has expired.\n"
-                                "You’ve been removed from the premium channel.\n\n"
-                                "To renew, please purchase again.",
-                                parse_mode=enums.ParseMode.HTML
-                            )
-                        except Exception as e:
-                            print(f"Failed to kick {user.id}: {e}")
+            if expiry_date:
+                await db.update_subscription(user.id, plan_key, channel_id, expiry_date)
 
-                    asyncio.create_task(auto_kick_user())
-            else:
-                await safe_action(
-                    query.message.edit_text,
-                    f"❌ No recent payment found for ₹{amount_expected}.\n\n"
-                    f"Please wait 1 minute and click **Payment Done** again.",
-                    parse_mode=enums.ParseMode.MARKDOWN
-                )
+                async def auto_kick_user():
+                    await asyncio.sleep((expiry_date - datetime.utcnow()).total_seconds())
+                    try:
+                        await client.ban_chat_member(channel_id, user.id)
+                        await client.unban_chat_member(channel_id, user.id)
+                        await db.deactivate_subscription(user.id)
+                        await client.send_message(
+                            user.id,
+                            f"⏰ Your {duration} premium has expired.\n"
+                            "You’ve been removed from the channel.\n"
+                        )
+                    except Exception as e:
+                        print(f"Failed to kick {user.id}: {e}")
+
+                asyncio.create_task(auto_kick_user())
+
             await safe_action(query.answer)
 
         # Demo & Price
@@ -720,18 +724,11 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            category_code = plan_key[:2]
-            duration_code = plan_key[2:]
-
-            plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
-            plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
-            plan_name = f"{plan_category} – {plan_duration}"
-
             await safe_action(
                 query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"🎫 Plan: {plan_name}\n"
+                    f"🎫 Plan: 🕵️‍♂️ Cp/Rp Collection\n"
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
@@ -788,7 +785,7 @@ async def callback(client, query):
                         f"📢 <b>New Payment Verified</b>\n\n"
                         f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
                         f"💬 <b>Username:</b> @{user.username or 'None'}\n"
-                        f"🎫 <b>Plan:</b> {plan_name}\n"
+                        f"🎫 <b>Plan:</b> 🕵️‍♂️ Cp/Rp Collection\n"
                         f"🕒 <b>Duration:</b> {duration}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                         f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
@@ -802,7 +799,7 @@ async def callback(client, query):
                     f"✅ Payment verified!\n\n"
                     f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
                     f"💬 Username: @{user.username or 'None'}\n"
-                    f"🎫 Plan: {plan_name}\n"
+                    f"🎫 Plan: 🕵️‍♂️ Cp/Rp Collection\n"
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"
@@ -931,18 +928,11 @@ async def callback(client, query):
             price, duration = plan_map[plan_key]
             amount_expected = int(price.replace("₹", ""))
 
-            category_code = plan_key[:2]
-            duration_code = plan_key[2:]
-
-            plan_category = PLAN_CATEGORY_MAP.get(category_code, "Unknown Category")
-            plan_duration = PLAN_DURATION_MAP.get(duration_code, "Unknown Duration")
-            plan_name = f"{plan_category} – {plan_duration}"
-
             await safe_action(
                 query.message.edit_text,
                 text=(
                     f"🔍 Checking payment status...\n\n"
-                    f"🎫 Plan: {plan_name}\n"
+                    f"🎫 Plan: 🚀 Mega Collection\n"
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"⚡ Please wait while we verify your transaction."
@@ -999,7 +989,7 @@ async def callback(client, query):
                         f"📢 <b>New Payment Verified</b>\n\n"
                         f"👤 <b>User:</b> {user.mention} (<code>{user.id}</code>)\n"
                         f"💬 <b>Username:</b> @{user.username or 'None'}\n"
-                        f"🎫 <b>Plan:</b> {plan_name}\n"
+                        f"🎫 <b>Plan:</b> 🚀 Mega Collection\n"
                         f"🕒 <b>Duration:</b> {duration}\n"
                         f"💰 <b>Amount:</b> ₹{amount_expected}\n"
                         f"🧾 <b>Txn ID:</b> <code>{matched_txn['txn_id']}</code>\n"
@@ -1013,7 +1003,7 @@ async def callback(client, query):
                     f"✅ Payment verified!\n\n"
                     f"👤 User: {user.mention} (<code>{user.id}</code>)\n"
                     f"💬 Username: @{user.username or 'None'}\n"
-                    f"🎫 Plan: {plan_name}\n"
+                    f"🎫 Plan: 🚀 Mega Collection\n"
                     f"🕒 Duration: {duration}\n"
                     f"💰 Amount: ₹{amount_expected}\n"
                     f"🧾 Txn ID: <code>{matched_txn['txn_id']}</code>\n"

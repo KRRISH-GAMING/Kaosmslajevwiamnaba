@@ -79,4 +79,19 @@ class Database:
         doc = await self.db.plan_channels.find_one({"plan_key": plan_key})
         return int(doc["channel_id"]) if doc and "channel_id" in doc else None
 
+    async def save_used_txn(self, txn_id: str):
+        await self.db.used_txns.update_one(
+            {"txn_id": txn_id},
+            {"$set": {"txn_id": txn_id}},
+            upsert=True
+        )
+
+    async def is_txn_used(self, txn_id: str) -> bool:
+        data = await self.db.used_txns.find_one({"txn_id": txn_id})
+        return data is not None
+
+    async def load_all_used_txns(self):
+        cursor = self.db.used_txns.find({})
+        return {doc["txn_id"] async for doc in cursor}
+
 db = Database(DB_URI, DB_NAME)
