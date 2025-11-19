@@ -90,6 +90,7 @@ async def start(client, message):
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
+            return
 
         buttons = [
             [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="plan")],
