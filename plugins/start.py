@@ -73,9 +73,8 @@ async def start(client, message):
                 LOG_TEXT.format(user_id, mention, username_text)
             )
 
-        payload = message.command[1] if len(message.command) > 1 else None
-
-        if payload:
+        args = message.text.split()
+        if len(args) > 1 and args[1] == "plan":
             buttons = [
                 [InlineKeyboardButton("🎬 Mixed Collection", callback_data="mix")],
                 [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="cp")],
@@ -87,6 +86,75 @@ async def start(client, message):
                 text=(
                     "📋 Choose a plan below:"
                     "\n\n🔽 Select which premium channel plan you want to buy:"
+                ),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        if len(args) > 1 and args[1] == "mix":
+            buttons = [
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFjZTczMjdkMTAyNjk2YjIxNzAz")],
+                [InlineKeyboardButton("💰 ₹100 - 1️⃣ Month", callback_data="y1p1")],
+                [InlineKeyboardButton("💰 ₹200 - 3️⃣ Month", callback_data="y1p2")],
+                [InlineKeyboardButton("💰 ₹300 - 6️⃣ Month", callback_data="y1p3")],
+                [InlineKeyboardButton("💰 ₹500 - Lifetime", callback_data="y1p4")],
+                [InlineKeyboardButton("🔙 Back", callback_data="plan")]
+            ]
+            await safe_action(
+                message.reply_text,
+                text=(
+                    "Available Plans👇🏻"
+                    "\n•1 Month: ₹100"
+                    "\n•3 Months: ₹200"
+                    "\n•6 Months: ₹300"
+                    "\n•Lifetime: ₹500"
+                    "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
+                ),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        if len(args) > 1 and args[1] == "cp":
+            buttons = [
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlMjgzMjdkMTAyNjk2YjIxNzE4")],
+                [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y2p1")],
+                [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y2p2")],
+                [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y2p3")],
+                [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y2p4")],
+                [InlineKeyboardButton("🔙 Back", callback_data="plan")]
+            ]
+            await safe_action(
+                message.reply_text,
+                text=(
+                    "Available Plans👇🏻"
+                    "\n•1 Month: ₹200"
+                    "\n•3 Months: ₹400"
+                    "\n•6 Months: ₹600"
+                    "\n•Lifetime: ₹1000"
+                    "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
+                ),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        if len(args) > 1 and args[1] == "mega":
+            buttons = [
+                [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlZDIzMjdkMTAyNjk2YjIxNzI0")],
+                [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y3p1")],
+                [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y3p2")],
+                [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y3p3")],
+                [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y3p4")],
+                [InlineKeyboardButton("🔙 Back", callback_data="plan")]
+            ]
+            await safe_action(
+                message.reply_text,
+                text=(
+                    "Available Plans👇🏻"
+                    "\n•1 Month: ₹200"
+                    "\n•3 Months: ₹400"
+                    "\n•6 Months: ₹600"
+                    "\n•Lifetime: ₹1000"
+                    "\n\nSelect A Plan To Subscribe Or Click 'Demo' To See A Preview📌"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
