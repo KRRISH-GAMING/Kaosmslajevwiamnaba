@@ -29,9 +29,9 @@ broadcast_cancel = False
 START_TIME = pytime.time()
 
 PLAN_CATEGORY_MAP = {
-    "y1": "Mixed Collection",
-    "y2": "CP/RP Collection",
-    "y3": "Mega Collection"
+    "mix": "Mixed Collection",
+    "cp": "CP/RP Collection",
+    "mega": "Mega Collection"
 }
 
 PLAN_CHANNEL_MAP = {
@@ -73,11 +73,29 @@ async def start(client, message):
                 LOG_TEXT.format(user_id, mention, username_text)
             )
 
+        payload = message.command[1] if len(message.command) > 1 else None
+
+        if payload:
+            buttons = [
+                [InlineKeyboardButton("🎬 Mixed Collection", callback_data="mix")],
+                [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="cp")],
+                [InlineKeyboardButton("🚀 Mega Collection", callback_data="mega")],
+                [InlineKeyboardButton("🔙 Back", callback_data="start")]
+            ]
+            await safe_action(
+                message.reply_text,
+                text=(
+                    "📋 Choose a plan below:"
+                    "\n\n🔽 Select which premium channel plan you want to buy:"
+                ),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+
         buttons = [
-            [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
+            [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="plan")],
             #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
             #[InlineKeyboardButton("♈ How To Buy Premium", url="https://t.me/Open_Shorten_Link_Tutorial/13")],
-            [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
+            [InlineKeyboardButton("🆘 Help & Support", callback_data="help")]
         ]
 
         return await safe_action(
@@ -106,11 +124,11 @@ async def resend_links_command(client, message):
         parts = message.text.split()
         if len(parts) < 3:
             return await message.reply_text(
-                "⚙️ Usage:\n`/resendlinks <plan_prefix> <new_channel_id>`\n\nExample:\n`/resendlinks y1 -1002123456789`",
+                "⚙️ Usage:\n`/resendlinks <plan_prefix> <new_channel_id>`\n\nExample:\n`/resendlinks mix -1002123456789`",
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-        plan_prefix = parts[1].strip()  # e.g. y1
+        plan_prefix = parts[1].strip()  # e.g. mix
         new_channel_id = int(parts[2].strip())
 
         await message.reply_text(
@@ -381,12 +399,12 @@ async def callback(client, query):
         global LAST_PAYMENT_CHECK, PAYMENT_CACHE
 
         # Start
-        if data == "x0":
+        if data == "start":
             buttons = [
-                [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="x1")],
+                [InlineKeyboardButton("🌟 Our Premium Plans", callback_data="plan")],
                 #[InlineKeyboardButton("📊 Check Your Subscription", callback_data="x2")],
                 #[InlineKeyboardButton("♈ How To Buy Premium", url="https://t.me/Open_Shorten_Link_Tutorial/13")],
-                [InlineKeyboardButton("🆘 Help & Support", callback_data="x3")]
+                [InlineKeyboardButton("🆘 Help & Support", callback_data="help")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -402,12 +420,12 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # Plans
-        elif data == "x1":
+        elif data == "plan":
             buttons = [
-                [InlineKeyboardButton("🎬 Mixed Collection", callback_data="y1")],
-                [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="y2")],
-                [InlineKeyboardButton("🚀 Mega Collection", callback_data="y3")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x0")]
+                [InlineKeyboardButton("🎬 Mixed Collection", callback_data="mix")],
+                [InlineKeyboardButton("🕵️‍♂️ Cp/Rp Collection", callback_data="cp")],
+                [InlineKeyboardButton("🚀 Mega Collection", callback_data="mega")],
+                [InlineKeyboardButton("🔙 Back", callback_data="start")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -420,14 +438,14 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # Demo & Price
-        elif data == "y1":
+        elif data == "mix":
             buttons = [
                 [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFjZTczMjdkMTAyNjk2YjIxNzAz")],
                 [InlineKeyboardButton("💰 ₹100 - 1️⃣ Month", callback_data="y1p1")],
                 [InlineKeyboardButton("💰 ₹200 - 3️⃣ Month", callback_data="y1p2")],
                 [InlineKeyboardButton("💰 ₹300 - 6️⃣ Month", callback_data="y1p3")],
                 [InlineKeyboardButton("💰 ₹500 - Lifetime", callback_data="y1p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
+                [InlineKeyboardButton("🔙 Back", callback_data="plan")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -456,7 +474,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid1_{data}")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y1")]
+                [InlineKeyboardButton("🔙 Back", callback_data="mix")]
             ]
 
             upi_id = "krishxmehta@fam"
@@ -630,14 +648,14 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # Demo & Price
-        elif data == "y2":
+        elif data == "cp":
             buttons = [
                 [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlMjgzMjdkMTAyNjk2YjIxNzE4")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y2p1")],
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Months", callback_data="y2p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Months", callback_data="y2p3")],
                 [InlineKeyboardButton("💰 ₹1000 - Lifetimes", callback_data="y2p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
+                [InlineKeyboardButton("🔙 Back", callback_data="plan")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -666,7 +684,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid2_{data}")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y2")]
+                [InlineKeyboardButton("🔙 Back", callback_data="cp")]
             ]
 
             upi_id = "krishxmehta@fam"
@@ -840,14 +858,14 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # Demo & Price
-        elif data == "y3":
+        elif data == "mega":
             buttons = [
                 [InlineKeyboardButton("🔥 Preview", url="https://t.me/XclusivePreviewBot?start=BATCH-NjhmZDFlZDIzMjdkMTAyNjk2YjIxNzI0")],
                 [InlineKeyboardButton("💰 ₹200 - 1️⃣ Month", callback_data="y3p1")],
                 [InlineKeyboardButton("💰 ₹400 - 3️⃣ Month", callback_data="y3p2")],
                 [InlineKeyboardButton("💰 ₹600 - 6️⃣ Month", callback_data="y3p3")],
                 [InlineKeyboardButton("💰 ₹1000 - Lifetime", callback_data="y3p4")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x1")]
+                [InlineKeyboardButton("🔙 Back", callback_data="plan")]
             ]
             await safe_action(
                 query.message.edit_text,
@@ -876,7 +894,7 @@ async def callback(client, query):
 
             buttons = [
                 [InlineKeyboardButton("✅ Payment Done", callback_data=f"paid3_{data}")],
-                [InlineKeyboardButton("🔙 Back", callback_data="y3")]
+                [InlineKeyboardButton("🔙 Back", callback_data="mega")]
             ]
 
             upi_id = "krishxmehta@fam"
@@ -1050,10 +1068,10 @@ async def callback(client, query):
             await safe_action(query.answer)
 
         # Help
-        elif data == "x3":
+        elif data == "help":
             buttons = [
                 [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/PookieManagerBot")],
-                [InlineKeyboardButton("🔙 Back", callback_data="x0")]
+                [InlineKeyboardButton("🔙 Back", callback_data="start")]
             ]
             await safe_action(
                 query.message.edit_text,
