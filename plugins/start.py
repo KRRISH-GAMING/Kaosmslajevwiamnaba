@@ -103,6 +103,7 @@ async def start(client, message):
             await safe_action(
                 message.reply_text,
                 text=(
+                    "🎬 Mixed Collection\n\n"
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹100"
                     "\n•3 Months: ₹200"
@@ -126,6 +127,7 @@ async def start(client, message):
             await safe_action(
                 message.reply_text,
                 text=(
+                    "🕵️‍♂️ Cp/Rp Collection\n\n"
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹200"
                     "\n•3 Months: ₹400"
@@ -149,6 +151,7 @@ async def start(client, message):
             await safe_action(
                 message.reply_text,
                 text=(
+                    "🚀 Mega Collection\n\n"
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹200"
                     "\n•3 Months: ₹400"
@@ -519,6 +522,7 @@ async def callback(client, query):
             await safe_action(
                 query.message.edit_text,
                 text=(
+                    "🎬 Mixed Collection\n\n"
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹100"
                     "\n•3 Months: ₹200"
@@ -729,6 +733,7 @@ async def callback(client, query):
             await safe_action(
                 query.message.edit_text,
                 text=(
+                    "🕵️‍♂️ Cp/Rp Collection\n\n"
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹200"
                     "\n•3 Months: ₹400"
@@ -939,6 +944,7 @@ async def callback(client, query):
             await safe_action(
                 query.message.edit_text,
                 text=(
+                    "🚀 Mega Collection\n\n"
                     "Available Plans👇🏻"
                     "\n•1 Month: ₹200"
                     "\n•3 Months: ₹400"
