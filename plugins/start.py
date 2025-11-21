@@ -170,11 +170,11 @@ async def resend_links_command(client, message):
         parts = message.text.split()
         if len(parts) < 3:
             return await message.reply_text(
-                "⚙️ Usage:\n`/resendlinks <plan_prefix> <new_channel_id>`\n\nExample:\n`/resendlinks mix -1002123456789`",
+                "⚙️ Usage:\n`/resendlinks <plan_prefix> <new_channel_id>`\n\nExample:\n`/resendlinks mix link`\n\nExample:\n`/resendlinks cp link`\n\nExample:\n`/resendlinks mega link`",
                 parse_mode=enums.ParseMode.MARKDOWN
             )
 
-        plan_prefix = parts[1].strip()  # e.g. mix
+        plan_prefix = parts[1].strip()
         new_channel_id = int(parts[2].strip())
 
         await message.reply_text(
