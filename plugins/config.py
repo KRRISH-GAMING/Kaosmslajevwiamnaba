@@ -19,6 +19,9 @@ try:
 
     # Channel Information
     LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", "-1002937162790"))
+    MIX_CHANNEL = int(os.environ.get("MIX_CHANNEL", "-1002745649036"))
+    CP_CHANNEL = int(os.environ.get("CP_CHANNEL", "-1003264225931"))
+    MEGA_CHANNEL = int(os.environ.get("MEGA_CHANNEL", "-1003212677737"))
 
     # This Is Force Subscribe Channel, also known as Auth Channel 
     auth_channel = os.environ.get("AUTH_CHANNEL", "-1002829948273") # give your force subscribe channel id here else leave it blank

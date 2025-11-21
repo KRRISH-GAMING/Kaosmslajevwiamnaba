@@ -28,32 +28,6 @@ broadcast_cancel = False
 
 START_TIME = pytime.time()
 
-PLAN_CATEGORY_MAP = {
-    "mix": "Mixed Collection",
-    "cp": "CP/RP Collection",
-    "mega": "Mega Collection"
-}
-
-PLAN_CHANNEL_MAP = {
-    # Desi/Onlyfans
-    "y1p1": -1002745649036,
-    "y1p2": -1002745649036,
-    "y1p3": -1002745649036,
-    "y1p4": -1002745649036,
-
-    # Cp/Rp
-    "y2p1": -1003264225931,
-    "y2p2": -1003264225931,
-    "y2p3": -1003264225931,
-    "y2p4": -1003264225931,
-
-    # Mega Collection
-    "y3p1": -1003212677737,
-    "y3p2": -1003212677737,
-    "y3p3": -1003212677737,
-    "y3p4": -1003212677737,
-}
-
 @Client.on_message(filters.command("start") & filters.private)
 async def start(client, message):
     try:
@@ -410,14 +384,25 @@ async def stats(client, message):
         print(f"⚠️ Stats Error: {e}")
         print(traceback.format_exc())
 
+def get_category_name(cat):
+    if cat == "y1":
+        return "Mix Collection"
+    elif cat == "y2":
+        return "CP/RP Collection"
+    elif cat == "y3":
+        return "Mega Collection"
+    else:
+        return f"Category {cat.upper()}"
+
 @Client.on_message(filters.command("premiumstats") & filters.private & filters.user(ADMINS))
 async def premium_stats(client, message):
     try:
         now = datetime.utcnow()
 
         cursor = db.col.find({})
-        active_counts = {k: 0 for k in PLAN_CATEGORY_MAP.keys()}
-        expired_counts = {k: 0 for k in PLAN_CATEGORY_MAP.keys()}
+
+        active_counts = {}
+        expired_counts = {}
         total_active = 0
         total_expired = 0
 
@@ -430,6 +415,11 @@ async def premium_stats(client, message):
                 continue
 
             category = plan_key[:2]
+
+            if category not in active_counts:
+                active_counts[category] = 0
+                expired_counts[category] = 0
+
             expiry = datetime.fromisoformat(expiry_str) if expiry_str else None
 
             if expiry and expiry > now and active:
@@ -443,15 +433,18 @@ async def premium_stats(client, message):
         text += f"👥 <b>Total Active:</b> {total_active}\n"
         text += f"💤 <b>Total Expired:</b> {total_expired}\n\n"
 
-        for key, name in PLAN_CATEGORY_MAP.items():
-            act = active_counts[key]
-            exp = expired_counts[key]
-            text += f"• <b>{name}</b> → {act} active / {exp} expired\n"
+        for category in sorted(active_counts.keys()):
+            act = active_counts[category]
+            exp = expired_counts[category]
+            cat_name = get_category_name(category)
+
+            text += f"• <b>{cat_name}</b> → {act} active / {exp} expired\n"
 
         await message.reply_text(text, parse_mode=enums.ParseMode.HTML)
 
     except Exception as e:
-        await safe_action(client.send_message,
+        await safe_action(
+            client.send_message,
             LOG_CHANNEL,
             f"⚠️ Premium Stats Error:\n\n<code>{e}</code>\n\nTraceback:\n<code>{traceback.format_exc()}</code>."
         )
@@ -641,11 +634,11 @@ async def callback(client, query):
 
             channel_id = await db.get_plan_channel(plan_key)
             if not channel_id:
-                channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                channel_id = MIX_CHANNEL
                 if not channel_id:
                     return await safe_action(
                         query.message.edit_text,
-                "⚠️ No channel assigned for this plan. Contact admin."
+                        "⚠️ No channel assigned for this plan. Contact admin."
                     )
 
             user = query.from_user
@@ -852,11 +845,11 @@ async def callback(client, query):
 
             channel_id = await db.get_plan_channel(plan_key)
             if not channel_id:
-                channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                channel_id = CP_CHANNEL
                 if not channel_id:
                     return await safe_action(
                         query.message.edit_text,
-                "⚠️ No channel assigned for this plan. Contact admin."
+                        "⚠️ No channel assigned for this plan. Contact admin."
                     )
 
             user = query.from_user
@@ -1063,11 +1056,11 @@ async def callback(client, query):
 
             channel_id = await db.get_plan_channel(plan_key)
             if not channel_id:
-                channel_id = PLAN_CHANNEL_MAP.get(plan_key)
+                channel_id = MEGA_CHANNEL
                 if not channel_id:
                     return await safe_action(
                         query.message.edit_text,
-                "⚠️ No channel assigned for this plan. Contact admin."
+                        "⚠️ No channel assigned for this plan. Contact admin."
                     )
 
             user = query.from_user
@@ -1145,7 +1138,7 @@ async def callback(client, query):
         # Help
         elif data == "help":
             buttons = [
-                [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/PookieManagerBot")],
+                [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/XclusiveManagerBot")],
                 [InlineKeyboardButton("🔙 Back", callback_data="start")]
             ]
             await safe_action(
@@ -1159,7 +1152,7 @@ async def callback(client, query):
                     "- Payment Issues: Contact our admin directly"
                     "- Access Problems: Contact admin with your subscription details"
                     "- If You Need More Premium: Talk to our support admin"
-                    "\n\nOur Support Admin: @admin"
+                    "\n\nOur Support Admin: @XclusiveManagerBot"
                 ),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
