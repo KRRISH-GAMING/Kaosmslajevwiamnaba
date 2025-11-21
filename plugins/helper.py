@@ -22,6 +22,11 @@ async def set_auto_menu(client):
         ]
         for admin_id in ADMINS:
             await client.set_bot_commands(owner_cmds, scope=BotCommandScopeChat(chat_id=admin_id))
+
+        default_cmds = [
+            BotCommand("start", "Check I am alive"),
+        ]
+        await client.set_bot_commands(default_cmds, scope=BotCommandScopeDefault())
     except Exception as e:
         await safe_action(client.send_message,
             LOG_CHANNEL,

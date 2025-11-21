@@ -386,7 +386,7 @@ async def stats(client, message):
 
 def get_category_name(cat):
     if cat == "y1":
-        return "Mix Collection"
+        return "Mixed Collection"
     elif cat == "y2":
         return "CP/RP Collection"
     elif cat == "y3":
